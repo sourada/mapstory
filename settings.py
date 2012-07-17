@@ -217,6 +217,17 @@ MAP_BASELAYERS = [{
     ]
 }]
 
+DEFAULT_VIEWER_TOOLS = [{
+    "ptype": "gxp_playback",
+    "id": "playback-tool",
+    "outputTarget": "map-bbar",
+    "looped": True,
+    "outputConfig":{
+        "xtype": 'app_playbacktoolbar',
+        "defaults": {"scale": 'medium'}
+    }
+}]
+
 # use new uploader
 USE_UPLOADER=True
 
