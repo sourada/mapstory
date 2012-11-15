@@ -29,11 +29,13 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template import loader
+from django.template import defaultfilters as filters
 from django.contrib.contenttypes.models import ContentType
 from django.views.decorators.cache import cache_page
 
 from lxml import etree
 from datetime import datetime
+import json
 import math
 import os
 import random
@@ -403,7 +405,7 @@ def invite_preview(req):
 
 def org_page(req, org_slug):
     import random
-    org = _resolve_object(req, models.Org, None, slug=org_slug)
+    org = get_object_or_404(models.Org, slug=org_slug)
     content = org.orgcontent_set.filter(name='main')
     rmodels = lambda m :random.sample(getattr(m,'objects').all(), 6)
     ctx = dict(org=org, org_content=content[0].text if content else None,
@@ -413,6 +415,27 @@ def org_page(req, org_slug):
                )
     return render_to_response('mapstory/orgs/org_page.html', RequestContext(req, ctx))
 
+
+def org_page_api(req, org_slug):
+    org = get_object_or_404(models.Org, slug=org_slug)
+    print req.user, org.user
+    if not (req.user is org.user or req.user.is_superuser):
+        raise PermissionDenied()
+    val = req.POST.get('banner_image', None)
+    if val is not None:
+        org.banner_image = val
+        org.save()
+        return HttpResponse(val)
+    val = req.POST.get('org_content', None)
+    if val is not None:
+        cnt, _ = org.orgcontent_set.get_or_create(name='main')
+        cnt.text = val
+        cnt.save()
+        val = filters.escape(val)
+        val = filters.urlize(val)
+        val = filters.linebreaks(val)
+        return HttpResponse(val)
+        
 
 def layer_xml_metadata(req, layer_id):
     obj = _resolve_object(req, Layer, 'maps.view_layer', perm_required=True, id=layer_id)

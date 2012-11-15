@@ -16,48 +16,103 @@
     .article-list ul li {
         display: inline;
         float: left;
-        margin: 23px;
-        padding: 10px;
+        margin: 10px 28px;
         background: white;
+        width: 256px;
+        height: 200px;
     }
     .tile a img {
         height: 128px;
         width: 256px;
     }
+    .avatar img {
+        width: auto !important;
+        height: auto !important;
+    }
+    .blurb {
+        float:right;
+    }
+    #orglinks {
+        min-height: 20em;
+    }
+    #orgcontent {
+        min-height: 20em;
+    }
+    #mediabanner {
+        min-height: 10em;
+    }
+    .navtabs {
+        font-size: medium;
+    }
+    .nav {
+        margin-bottom: 0px;
+    }
+    #editpanel {
+        background: gray;
+        position: absolute;
+        z-level: 1000;
+    }
+    #editbuttons {
+        float: right;
+        position: relative;
+        bottom: 2px;
+        right: 2px;
+    }
 </style>
 {% endblock %}
 
 {% block main %}
-<div class="row">
-    <div id="org-banner">
-        {% edit_widget banner%}
-        {% if org.banner_image %}
-        <img src="{{ org.banner_image }}"></img>
-        {% else %}
-        <h2>Your Banner Image Goes Here</h2>
-        {% endif %}
+<div id="org-banner" class="box mrg-btm">
+    {% edit_widget banner%}
+    <div class="banner_image" data-content="banner_image">
+        <img src="{{ org.banner_image }}" {% if not org.banner_image %}style="display:none"{% endif %}></img>
+        {% if not org.banner_image %}<h2 class="placeholder">Your Banner Image Goes Here</h2>{% endif %}
     </div>
 </div>
-<div class="row">
-    {% edit_widget content %}
-    <h2>{{ org.name }}</h2>
-    <p class="content-main">{{ org_content|default:"Your Content Goes Here"|escape|urlize|linebreaks|safe}}
-    </p>
+<div class="row mrg-btm">
+    <div class="span8">
+        <div class="box" id="orgcontent">
+            {% edit_widget content %}
+            <h2>{{ org.name }}</h2>
+            <div data-content="org_content">{{ org_content|default:"Your Content Goes Here"|escape|urlize|linebreaks|safe}}
+            </div>
+        </div>
+    </div>
+    <div class="span4">
+        <div class="box" id="orglinks">
+            {% edit_widget links %}
+            
+            <ul data-content="org_links">
+            {% if org.links.count %}
+                {% for l in org.links.all %}
+                <li><a href="{{l.url}}">{{l.name}}</a></li>
+                {% endfor %}
+            {% else %}
+                <li>Links PlaceHolder</li>
+                <li>Links PlaceHolder</li>
+                <li>Links PlaceHolder</li>
+            {% endif %}
+            </ul>
+
+        </div>
+    </div>
 </div>
-<div class="row">
+<div id="mediabanner" class="box mrg-btm">
     {% edit_widget media %}
-    <div>Media Banner PlaceHolder</div>
-</div>
-<div class="row">
-    {% edit_widget links %}
-    <div>Links PlaceHolder</div>
-    <ul>
-        {% for l in org.links.all %}
-        <li><a href="{{l.url}}">{{l.name}}</a></li>
-        {% endfor %}
+    <ul data-content="org_ribbon_links">
+        {% if org.links.count %}
+            {% for l in org.links.all %}
+            <li><img src="{{l.href}}"></li>
+            {% endfor %}
+        {% else %}
+            <li>Media Placeholder</li>
+            <li>Media Placeholder</li>
+            <li>Media Placeholder</li>
+        {% endif %}
     </ul>
 </div>
-<div class="row">
+
+<div>
     <div class="tabbable">
         <ul class="nav nav-tabs fancyfont">
             <li class="active"><a href="#1" data-toggle="tab">MAPSTORIES</a></li>
@@ -65,7 +120,7 @@
             <li><a href="#3" data-toggle="tab">STORYTELLERS</a></li>
             <li><a href="#4" data-toggle="tab">STORYLAYERS USED BY</a></li>
         </ul>
-        <div class="tab-content">
+        <div class="tab-content box">
             <div class="tab-pane active" id="1">
                 <div class="article-list">
                     <ul>
@@ -105,10 +160,28 @@
         </div>
     </div>
 </div>
+<div id="editpanel" style="display:none;">
+    <div id="editpanel-content">
+        <div id="edit_banner_image">
+            <label>The URL to use for your image : </label><input type="text" width="30" value="{{org.banner_image|default:''}}">
+        </div>
+        <div id="edit_org_content">
+            <label>The content : </label>
+            <textarea style="width:165px;height:130px;resize:both">{{ org_content|default:""}}</textarea>
+        </div>
+    </div>
+    <div id="editbuttons">
+        <span id="editmsg"></span>
+        <a href="#cancel" class="btn btn-small">Cancel</a>
+        <a href="#ok" class="btn btn-small">OK</a>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_body %}
-{% if can_edit_page %}
+{{ can_edit }}
+{% if can_edit %}
 <script type="text/javascript" src="{% static "script/org_edit.js" %}"></script>
 {% endif %}
+
 {% endblock %}

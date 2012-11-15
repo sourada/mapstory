@@ -221,7 +221,6 @@ class Org(ContactDetail):
         # ensure a user exists but make sure after the contact exists
         # or our signal will create a ContactDetail for the user
         if self.user is None:
-            print self.id
             self.user = User.objects.create(username=self.organization)
             self.id = ContactDetail.objects.filter(user=self.user)[0].id
         self.name = self.organization
