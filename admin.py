@@ -43,8 +43,22 @@ class VideoLinkAdmin(admin.ModelAdmin):
 class ContactDetailAdmin(admin.ModelAdmin):
     pass
 
+class OrgAdmin(admin.ModelAdmin):
+    def get_form(self, request, obj=None, **kwargs):
+        print kwargs, obj
+        if not obj:
+            self.fields = ('organization',)
+        else:
+            self.fields = None
+        return super(OrgAdmin, self).get_form(request, obj, **kwargs)
+
+class OrgContentAdmin(admin.ModelAdmin):
+    pass
+
 admin.site.register(VideoLink, VideoLinkAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(ContactDetail, ContactDetailAdmin)
 admin.site.register(Resource, ResourceAdmin)
+admin.site.register(Org, OrgAdmin)
+admin.site.register(OrgContent, OrgContentAdmin)
 admin.site.register(Topic)

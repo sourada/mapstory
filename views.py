@@ -263,6 +263,7 @@ def add_to_map(req,id,typename):
 
 def about_storyteller(req, username):
     user = get_object_or_404(User, username=username)
+    print user.org
     return render_to_response('mapstory/about_storyteller.html', RequestContext(req,{
         "storyteller" : user,
     }))
@@ -399,6 +400,13 @@ def invite_preview(req):
         "signup_url": signup_url,
     }
     return render_to_response('account/email/invite_user.txt', ctx)
+
+
+def org_page(req, slug):
+    org = _resolve_object(req, models.Org, None, slug=slug)
+    content = org.orgcontent.filter(name='main')
+    ctx = dict(org=org, org_content=content[0].text if content else 'Placeholder')
+    return render_to_response('mapstory/orgs/org_page.html', RequestContext(ctx))
 
 
 def layer_xml_metadata(req, layer_id):

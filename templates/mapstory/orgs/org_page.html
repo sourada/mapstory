@@ -1,0 +1,16 @@
+{% extends no_bottom_layout.html %}
+{% load org_tags %}
+{% load mapstory_tags %}
+
+
+{% block main %}
+<div class="row">
+    <div id="org-banner">
+        <img src="{{ org.banner_image }}"></img>
+    </div>
+</div>
+<div class="row">
+    <h2>{{ org.username }}</h2>
+    <p>{{ org_content }}</p>
+</div>
+{% endblock %}
