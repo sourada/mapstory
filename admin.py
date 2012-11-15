@@ -45,7 +45,6 @@ class ContactDetailAdmin(admin.ModelAdmin):
 
 class OrgAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
-        print kwargs, obj
         if not obj:
             self.fields = ('organization',)
         else:
