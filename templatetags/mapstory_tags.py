@@ -328,6 +328,9 @@ def manual_link(target, name):
 def manual_include(path):
     return "<div id='manual'>%s</div>" % render_manual(path)
 
+@register.simple_tag
+def storyteller_tile(user):
+    return "<div>{{user.username}}"
 
 @register.simple_tag
 def warn_status(req, obj):

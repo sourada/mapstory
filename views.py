@@ -263,7 +263,6 @@ def add_to_map(req,id,typename):
 
 def about_storyteller(req, username):
     user = get_object_or_404(User, username=username)
-    print user.org
     return render_to_response('mapstory/about_storyteller.html', RequestContext(req,{
         "storyteller" : user,
     }))
@@ -402,11 +401,17 @@ def invite_preview(req):
     return render_to_response('account/email/invite_user.txt', ctx)
 
 
-def org_page(req, slug):
-    org = _resolve_object(req, models.Org, None, slug=slug)
-    content = org.orgcontent.filter(name='main')
-    ctx = dict(org=org, org_content=content[0].text if content else 'Placeholder')
-    return render_to_response('mapstory/orgs/org_page.html', RequestContext(ctx))
+def org_page(req, org_slug):
+    import random
+    org = _resolve_object(req, models.Org, None, slug=org_slug)
+    content = org.orgcontent_set.filter(name='main')
+    rmodels = lambda m :random.sample(getattr(m,'objects').all(), 6)
+    ctx = dict(org=org, org_content=content[0].text if content else None,
+               can_edit=req.user.is_superuser or req.user == org.user,
+               layers = rmodels(Layer), maps=rmodels(Map),
+               members = rmodels(User), using=rmodels(Map)
+               )
+    return render_to_response('mapstory/orgs/org_page.html', RequestContext(req, ctx))
 
 
 def layer_xml_metadata(req, layer_id):
