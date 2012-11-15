@@ -193,11 +193,45 @@ class VideoLink(Link):
     
 class ContactDetail(Contact):
     '''Additional User details'''
-    blurb = models.CharField(max_length=140, null=True)
+    blurb = models.CharField(max_length=140, null=True, blank=True)
     biography = models.CharField(max_length=1024, null=True, blank=True)
     education = models.CharField(max_length=512, null=True, blank=True)
     expertise = models.CharField(max_length=256, null=True, blank=True)
-    links = models.ManyToManyField(Link)
+    links = models.ManyToManyField(Link, blank=True)
+    
+    def __unicode__(self):
+        return u"ContactDetail %s (%s)" % (self.user, self.organization)
+    
+# cannot be called Organization - the organization field is used already in Contact
+class Org(ContactDetail):
+    slug = models.SlugField(max_length=64, blank=True)
+    members = models.ManyToManyField(User, blank=True)
+    ribbon_links = models.ManyToManyField(Link, blank=True)
+    banner_image = models.URLField(null=True, blank=True)
+    
+    def get_absolute_url(self):
+        return reverse('org_page', args=[self.slug])
+    
+    def save(self,*args,**kw):
+        # ensure a user exists but make sure after the contact exists
+        # or our signal will create a ContactDetail for the user
+        if self.user is None:
+            print self.id
+            self.user = User.objects.create(username=self.organization)
+            self.id = ContactDetail.objects.filter(user=self.user)[0].id
+        self.name = self.organization
+        slugtext = self.organization.replace('&','and')
+        self.slug = defaultfilters.slugify(slugtext)
+        models.Model.save(self)
+
+            
+    def __unicode__(self):
+        return u"Org %s (%s)" % (self.user, self.organization)
+    
+class OrgContent(models.Model):
+    name = models.CharField(max_length=32)
+    text = models.TextField(null=True, blank=True)
+    org = models.ForeignKey(Org)
     
 class Resource(models.Model):
     name = models.CharField(max_length=64)
@@ -336,7 +370,7 @@ def audit_layer_metadata(layer):
     
 def create_profile(instance, sender, **kw):
     if kw['created']:
-        ContactDetail.objects.create(user = instance)
+        ContactDetail.objects.get_or_create(user = instance)
 
 def create_publishing_status(instance, sender, **kw):
     if kw['created']:
