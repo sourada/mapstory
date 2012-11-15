@@ -199,6 +199,11 @@ class ContactDetail(Contact):
     expertise = models.CharField(max_length=256, null=True, blank=True)
     links = models.ManyToManyField(Link, blank=True)
     
+    def get_absolute_url(self):
+        if hasattr(self, 'org'):
+            return reverse('org_page', args=[self.org.slug])
+        return reverse('about_storyteller', args=[self.user.username])
+    
     def __unicode__(self):
         return u"ContactDetail %s (%s)" % (self.user, self.organization)
     

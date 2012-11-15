@@ -87,7 +87,6 @@ urlpatterns += patterns('mapstory.views',
     url(r'^data/style/upload$','upload_style',name='upload_style'),
     
     # semi-temp urls
-    url(r'^mapstory/(?P<org_slug>[-\w]+)$','org_page',name='org_page'),
     url(r'^mapstory/metadata/(?P<layer_id>\d+)$','layer_xml_metadata',name='layer_xml_metadata'),
     url(r'^mapstory/topics/(?P<layer_or_map>\w+)/(?P<layer_or_map_id>\d+)$','topics_api',name='topics_api'),
     url(r'^mapstory/comment/(?P<layer_or_map_id>\d+)/(?P<comment_id>\d+)$','delete_story_comment',name='delete_story_comment'),
@@ -110,7 +109,9 @@ urlpatterns += patterns('mapstory.views',
         "extra_context" : {'html':'mapstory/thoughts/rb.html'}}, name="thoughts-rb"),
     url(r"^mapstory/thoughts/r-siva-kumar", direct_to_template, {"template": "mapstory/thoughts.html",
         "extra_context" : {'html':'mapstory/thoughts/sk.html'}}, name="thoughts-sk"),
-
+    
+    # the catchall
+    url(r'^(?P<org_slug>[-\w]+)$','org_page',name='org_page'),
 )
 
 urlpatterns += proxy_urlpatterns
