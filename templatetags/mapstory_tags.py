@@ -330,7 +330,9 @@ def manual_include(path):
 
 @register.simple_tag
 def storyteller_tile(user):
-    return "<div>{{user.username}}"
+    ctx = dict(user=user, map_cnt=Map.objects.filter(owner=user).count(),
+               layer_cnt=Layer.objects.filter(owner=user).count())
+    return loader.render_to_string('mapstory/_user_tile.html', ctx)
 
 @register.simple_tag
 def warn_status(req, obj):
