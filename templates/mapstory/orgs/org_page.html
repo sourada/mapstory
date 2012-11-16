@@ -41,7 +41,7 @@
     #mediabanner {
         min-height: 10em;
     }
-    .navtabs {
+    .nav-tabs a {
         font-size: medium;
     }
     .nav {
@@ -62,7 +62,7 @@
 {% endblock %}
 
 {% block main %}
-<div id="org-banner" class="box mrg-btm">
+<div id="org-banner" class="box mrg-btm mrg-top">
     {% edit_widget banner%}
     <div class="banner_image" data-content="banner_image">
         <img src="{{ org.banner_image }}" {% if not org.banner_image %}style="display:none"{% endif %}></img>

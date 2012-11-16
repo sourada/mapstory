@@ -418,7 +418,6 @@ def org_page(req, org_slug):
 
 def org_page_api(req, org_slug):
     org = get_object_or_404(models.Org, slug=org_slug)
-    print req.user, org.user
     if not (req.user is org.user or req.user.is_superuser):
         raise PermissionDenied()
     val = req.POST.get('banner_image', None)
