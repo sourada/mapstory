@@ -113,7 +113,10 @@ urlpatterns += patterns('mapstory.views',
         "extra_context" : {'html':'mapstory/thoughts/rb.html'}}, name="thoughts-rb"),
     url(r"^mapstory/thoughts/r-siva-kumar", direct_to_template, {"template": "mapstory/thoughts.html",
         "extra_context" : {'html':'mapstory/thoughts/sk.html'}}, name="thoughts-sk"),
-
+    
+    # the catchall
+    url(r'^(?P<org_slug>[-\w]+)$','org_page',name='org_page'),
+    url(r'^(?P<org_slug>[-\w]+)/api$','org_page_api',name='org_page_api'),
 )
 
 urlpatterns += proxy_urlpatterns

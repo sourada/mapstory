@@ -380,6 +380,11 @@ def manual_link(target, name):
 def manual_include(path):
     return "<div id='manual'>%s</div>" % render_manual(path)
 
+@register.simple_tag
+def storyteller_tile(user):
+    ctx = dict(user=user, map_cnt=Map.objects.filter(owner=user).count(),
+               layer_cnt=Layer.objects.filter(owner=user).count())
+    return loader.render_to_string('mapstory/_user_tile.html', ctx)
 
 @register.simple_tag
 def warn_status(req, obj):
