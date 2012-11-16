@@ -41,7 +41,10 @@
     #mediabanner {
         min-height: 10em;
     }
-    .navtabs {
+    #orgcontent p {
+        margin-bottom: 1em;
+    }
+    .nav-tabs a {
         font-size: medium;
     }
     .nav {
@@ -62,7 +65,7 @@
 {% endblock %}
 
 {% block main %}
-<div id="org-banner" class="box mrg-btm">
+<div id="org-banner" class="box mrg-btm mrg-top">
     {% edit_widget banner%}
     <div class="banner_image" data-content="banner_image">
         <img src="{{ org.banner_image }}" {% if not org.banner_image %}style="display:none"{% endif %}></img>
@@ -85,7 +88,7 @@
             <ul data-content="org_links">
             {% if org.links.count %}
                 {% for l in org.links.all %}
-                <li><a href="{{l.url}}">{{l.name}}</a></li>
+                <li><a href="{{l.href}}">{{l.name}}</a></li>
                 {% endfor %}
             {% else %}
                 <li>Links PlaceHolder</li>
