@@ -65,11 +65,7 @@
 {% endblock %}
 
 {% block main %}
-<<<<<<< HEAD
 <div id="org-banner" class="box mrg-btm mrg-top">
-=======
-<div id="org-banner" class="box mrg-btm">
->>>>>>> 81b2c75... user tiles, some editing, better layout
     {% edit_widget banner%}
     <div class="banner_image" data-content="banner_image">
         <img src="{{ org.banner_image }}" {% if not org.banner_image %}style="display:none"{% endif %}></img>
@@ -92,11 +88,7 @@
             <ul data-content="org_links">
             {% if org.links.count %}
                 {% for l in org.links.all %}
-<<<<<<< HEAD
                 <li><a href="{{l.href}}">{{l.name}}</a></li>
-=======
-                <li><a href="{{l.url}}">{{l.name}}</a></li>
->>>>>>> 81b2c75... user tiles, some editing, better layout
                 {% endfor %}
             {% else %}
                 <li>Links PlaceHolder</li>
