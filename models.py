@@ -7,6 +7,7 @@ import time
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import Count
 from django.db.models import signals
@@ -94,6 +95,22 @@ def get_ratings(model):
     return results
 
 
+def get_related_stories(obj):
+    if isinstance(obj, Section):
+        topics = obj.topics.all()
+    else:
+        topics = list(obj.topic_set.all())
+    maps = []
+    # @todo gather from all topics and respective sections
+    sections = topics and topics[0].section_set.all() or None
+    if topics and sections:
+        sec = sections[0]
+        maps = sec.get_maps()
+        if isinstance(obj, Map) and obj in maps:
+            maps.remove(obj)
+    return list(maps)
+
+
 class SectionManager(models.Manager):
     def sections_with_maps(self):
         '''@todo this is broken - Get only those sections that have maps'''
@@ -133,19 +150,20 @@ class Section(models.Model):
     topics = models.ManyToManyField(Topic,blank=True)
     order = models.IntegerField(null=True,blank=True)
     
-    def _children(self, att, **kw):
-        field = lambda t: getattr(t,att).filter(**kw)
-        return set(chain(*[ field(t) for t in self.topics.all()]))
+    def _children(self, model, **kw):
+        query = model.objects.filter(**kw)
+        return query.filter(topic__in=self.topics.all())
     
     def all_children(self):
-        x = self.get_maps() | self.get_layers()
-        return x
+        ch = list(self.get_maps())
+        ch.extend(self.get_layers())
+        return ch
     
     def get_maps(self):
-        return self._children('maps', publish__status=PUBLISHING_STATUS_PUBLIC)
+        return self._children(Map, publish__status=PUBLISHING_STATUS_PUBLIC)
         
     def get_layers(self):
-        return self._children('layers', publish__status=PUBLISHING_STATUS_PUBLIC)
+        return self._children(Layer, publish__status=PUBLISHING_STATUS_PUBLIC)
     
     def save(self,*args,**kw):
         slugtext = self.name.replace('&','and')
@@ -153,6 +171,10 @@ class Section(models.Model):
         if self.order is None:
             self.order = self.id
         models.Model.save(self)
+        
+    def maps_pager(self, page_size=6):
+        '''make it easy to get a paginator in a template'''
+        return Paginator(list(self.get_maps()), page_size)
         
     def get_absolute_url(self):
         return reverse('section_detail',args=[self.slug])
