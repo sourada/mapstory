@@ -20,7 +20,7 @@ Uploading Your StoryLayers
 
 To get started with building your own stories, you must first upload some data,
 referred to as StoryLayers in MapStory. A StoryLayer might stand on it's own
-or be used as part of a StoryMap containing multiple StoryLayers.
+or be used as part of a MapStory containing multiple StoryLayers.
 
 Before uploading your StoryLayers, please read this section to understand the
 currently supported data formats and tips that will make this process easier.
@@ -87,7 +87,7 @@ provided one during upload. A style dictates how a StoryLayer will look when
 it is displayed either in a map or on it's own. A StoryLayer has a default
 style and zero or more optional styles that it can be displayed with. The
 default style is how the StoryLayer will be displayed on the info page and
-will also be the default when added to a StoryMap. When in a StoryMap, a
+will also be the default when added to a MapStory. When in a MapStory, a
 StoryLayer may appear multiple times with different styles applied.
 
 One can manage the default style, upload additional styles, or download styles 
@@ -101,7 +101,7 @@ Editing Styles
 --------------
 
 At the moment, MapStory provides some support for editing styles when a 
-StoryLayer is part of a StoryMap. Styles in MapStory are stored in an open text 
+StoryLayer is part of a MapStory. Styles in MapStory are stored in an open text
 format known as
 `SLD <http://docs.geoserver.org/stable/en/user/styling/sld-introduction.html>`_ .
 This means they can be edited by hand or in other tools, such as
@@ -111,7 +111,7 @@ This means they can be edited by hand or in other tools, such as
 Publishing Your Work
 ====================
 
-When first created, a StoryLayer or StoryMap is considered `Private`. This
+When first created, a StoryLayer or MapStory is considered `Private`. This
 means that only you can search for or view it. When you are ready, ensure that
 you choose the appropriate publishing status. This can be done on the info page
 at the bottom of the `Info` tab.
@@ -119,7 +119,7 @@ at the bottom of the `Info` tab.
 .. tip::
    :class: alert alert-info
    
-   If you are changing the status of a StoryMap, any StoryLayers it uses that
+   If you are changing the status of a MapStory, any StoryLayers it uses that
    you own will also be changed.
 
 The available options:
@@ -135,3 +135,34 @@ The available options:
      - Will be hidden from search but others can view via the link.
    * - Public (Anyone can search for and view)
      - As implied.
+
+Using media in annotations
+==========================
+
+The following types of media can be embedded in an annotation popup in the description field:
+
+* YouTube
+* Flickr
+* An arbitrary hyperlink
+
+To embed a YouTube video, use the following syntax:
+
+    [youtube=http://www.youtube.com/watch?v=O_s3EryiL7M]
+
+If you want to influence the width and or height of the video iframe, add a w and/or h url parameter, e.g.:
+
+    [youtube=http://www.youtube.com/watch?v=O_s3EryiL7M&w=350] 
+
+but in keep in mind that the popups have a maximum width of 500 pixels.
+
+You can combine the YouTube video with any HTML in front or after the YouTube declaration.
+
+For Flickr use the Share button in the Flickr interface and then press the Grab HTML/BBCode hyperlink.
+Copy/paste the HTML, but make sure to change the target to _blank on the anchor:
+
+    <a target="_blank" href="http://www.flickr.com/photos/jetbluestone/8128332626/" title="48.. by jetbluestone, on Flickr"><img src="http://farm9.staticflickr.com/8472/8128332626_b231b833db.jpg" width="371" height="500" alt="48.."></a>
+
+To embed any arbitrary hyperlink in the annotation popup, just use plain old HTML, for example:
+
+    <a target="_blank" href="http://myurl" title="myhyperlink">click here to go to my url</a>
+

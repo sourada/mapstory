@@ -399,6 +399,9 @@ def pagination(pager, url_name, *args):
         pager = Page([], 0, pager)
     return loader.render_to_string('_pagination.html', {'page' : pager, 'url': url})
 
+def user_activity_email_prefs(user):
+    return loader.render_to_string('mapstory/user_activity_email_prefs.html',{'user': user})
+
 # @todo - make geonode location play better
 if settings.GEONODE_CLIENT_LOCATION.startswith("http"):
     @register.simple_tag
