@@ -19,6 +19,7 @@ from mapstory.util import render_manual
 from dialogos.templatetags import dialogos_tags
 
 import re
+import os
 
 register = template.Library()
 
@@ -296,6 +297,25 @@ class ByStoryTellerNode(template.Node):
             'maps':maps,
             'layers':layers
         })
+
+
+@register.simple_tag
+def render_link(link, width=None, height=None):
+    '''Render a 'link' as best as possible. This means either an img element,
+    a youtube embedded viewer, or a default link. Ideally, support oembed.
+    '''
+    ctx = dict(href=link.href, name=link.name, width=width or 256, height=height or 128)
+    if link.is_image():
+        return '<img src="%(href)s" title="%(name)s"></img>' % ctx
+    video = link.get_youtube_video()
+    if video:
+        ctx['video'] = video
+        return ('<iframe class="youtube-player" type="text/html"'
+                ' width="%(width)s" height="%(height)s" frameborder="0"'
+                ' src="http://www.youtube.com/embed/%(video)s">'
+                '</iframe>') % ctx
+    return '<a target="_" href="%(href)s">%(name)s</a>' % ctx
+
 
 @register.simple_tag
 def layer_language_selector(layer):

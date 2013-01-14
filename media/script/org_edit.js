@@ -29,7 +29,7 @@ $(function() {
             parent = el.parent('.box'),
             position = parent.position();
         currentContent = el;
-        widget.find('div').hide();
+        widget.children('div').hide();
         currentWidget = $("#edit_" + action).show();
         panel.css({
             top: position.top,
@@ -53,7 +53,7 @@ $(function() {
         });
     }
     
-    widget.find('div').hide();
+    widget.children('div').hide();
     $("a[href=#cancel]").click(function(ev) {
         ev.preventDefault();
         panel.hide();

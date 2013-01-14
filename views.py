@@ -460,7 +460,28 @@ def org_page_api(req, org_slug):
         val = filters.urlize(val)
         val = filters.linebreaks(val)
         return HttpResponse(val)
-        
+    val = req.POST.get('link', None)
+    if val is not None:
+        linkjson = json.loads(val)
+        id = linkjson.get('id', None)
+        if id:
+            link = org.get_link(id)
+            if not link:
+                raise PermissionDenied()
+        else:
+            link = models.Link()
+        if 'delete' in linkjson:
+            link.delete()
+        else:
+            link.name = linkjson.get('name')
+            link.href = linkjson.get('href')
+            link.save()
+            rel = org.links
+            if linkjson.get('type') == 'ribbon':
+                rel = org.ribbon_links
+            rel.add(link)
+        return HttpResponse(json.dumps({'id': link.id}))
+
 
 def layer_xml_metadata(req, layer_id):
     obj = _resolve_object(req, Layer, 'maps.view_layer', perm_required=True, id=layer_id)
