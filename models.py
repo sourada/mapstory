@@ -188,6 +188,7 @@ class Section(models.Model):
 class Link(models.Model):
     name = models.CharField(max_length=64)
     href = models.CharField(max_length=256)
+    order = models.IntegerField(default=0, blank=True, null=True)
 
     def is_image(self):
         ext = os.path.splitext(self.href)[1][1:].lower()

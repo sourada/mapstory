@@ -1,0 +1,49 @@
+{% extends "no_bottom_layout.html" %}
+{% load org_tags %}
+{% load mapstory_tags %}
+{% load staticfiles %}
+
+{% block title %}{{ org.name }}{% endblock %}
+
+{% block extra_head %}
+<style type="text/css">
+    .tile img {
+        width: 256px;
+    }
+    .details {
+        float: right;
+    }
+    .details order {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+<h2>Media Links</h2>
+<button id="newmedia" value="New"></button>
+{% for l in media %}
+<div class="tile media" id="link-{{l.id}}">
+    <div class="details">
+        <span class="name">{{ l.name }}</span>
+        <span class="href">{{ l.href }}</span>
+        <span class="order">{{ l.order }}</span>
+    </div>
+    {% render_link l %}
+</div>
+{% endfor %}
+{% endblock %}
+
+<div id="linkedit" style="display:none">
+    <form method="POST" action="">
+        <label for="name">Name</label>
+        <input name="name" type="text">
+        <label for="href">URL</label>
+        <input name="href" type="text">
+        <input name="id" type="hidden">
+    </form>
+</div>
+
+{% block extra_body %}
+
+{% endblock %}

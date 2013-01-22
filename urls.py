@@ -114,6 +114,7 @@ urlpatterns += patterns('mapstory.views',
     # the catchall
     url(r'^(?P<org_slug>[-\w]+)$','org_page',name='org_page'),
     url(r'^(?P<org_slug>[-\w]+)/api$','org_page_api',name='org_page_api'),
+    url(r'^(?P<org_slug>[-\w]+)/links$','org_links',name='org_links'),
 )
 
 urlpatterns += proxy_urlpatterns

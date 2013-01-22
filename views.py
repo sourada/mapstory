@@ -483,6 +483,21 @@ def org_page_api(req, org_slug):
         return HttpResponse(json.dumps({'id': link.id}))
 
 
+def org_links(req, org_slug):
+    org = get_object_or_404(models.Org, slug=org_slug)
+    if not (req.user is org.user or req.user.is_superuser):
+        raise PermissionDenied()
+    if req.method == 'POST':
+        pass
+    else:
+        ctx = {
+            'links' : org.links.all().order_by('order'),
+            'media' : org.ribbon_links.all().order_by('order')
+        }
+        return render_to_response('mapstory/orgs/org_links.html',
+                                  RequestContext(req, ctx))
+
+
 def layer_xml_metadata(req, layer_id):
     obj = _resolve_object(req, Layer, 'maps.view_layer', perm_required=True, id=layer_id)
     return render_to_response('mapstory/full_metadata.xml', {'layer': obj}, mimetype='text/xml')
