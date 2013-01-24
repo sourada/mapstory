@@ -13,6 +13,7 @@ from mapstory.util import render_manual
 from mapstory.forms import CheckRegistrationForm
 from mapstory.forms import StyleUploadForm
 from mapstory.forms import LayerForm
+from mapstory.templatetags import mapstory_tags
 import account.views
 
 from django.contrib.auth.models import User
@@ -460,6 +461,7 @@ def org_page_api(req, org_slug):
         val = filters.urlize(val)
         val = filters.linebreaks(val)
         return HttpResponse(val)
+    # @todo evaluate removal of link part
     val = req.POST.get('link', None)
     if val is not None:
         linkjson = json.loads(val)
@@ -483,19 +485,38 @@ def org_page_api(req, org_slug):
         return HttpResponse(json.dumps({'id': link.id}))
 
 
-def org_links(req, org_slug):
+def org_links(req, org_slug, link_type='links'):
     org = get_object_or_404(models.Org, slug=org_slug)
     if not (req.user is org.user or req.user.is_superuser):
         raise PermissionDenied()
+    # resolve the m2m
+    member = getattr(org, link_type)
+    error = ''
     if req.method == 'POST':
-        pass
-    else:
-        ctx = {
-            'links' : org.links.all().order_by('order'),
-            'media' : org.ribbon_links.all().order_by('order')
-        }
-        return render_to_response('mapstory/orgs/org_links.html',
-                                  RequestContext(req, ctx))
+        if req.POST['id']:
+            # before updating, make sure the org owns the link
+            link = member.get(id = req.POST['id'])
+        else:
+            link = models.Link()
+        if 'delete' in req.POST:
+            link.delete()
+        else:
+            fields = ('name', 'href', 'order')
+            if not all([req.POST[f] for f in fields]):
+                error = 'Name and URL are required'
+            else:
+                for f in fields: setattr(link, f, req.POST[f])
+                link.save()
+                member.add(link)
+
+    ctx = {
+        'links' : member.all().order_by('order'),
+        'link_type' : link_type,
+        'org' : org,
+        'error' : error
+    }
+    return render_to_response('mapstory/orgs/org_links.html',
+                              RequestContext(req, ctx))
 
 
 def layer_xml_metadata(req, layer_id):

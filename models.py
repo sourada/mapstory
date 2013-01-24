@@ -194,7 +194,6 @@ class Link(models.Model):
         ext = os.path.splitext(self.href)[1][1:].lower()
         return ext in ('gif','jpg','jpeg','png')
 
-
     def get_youtube_video(self):
         prefix = 'https?://(?:w{3}\.)?'
         pats = (
@@ -206,6 +205,21 @@ class Link(models.Model):
             match = re.match(prefix + p, self.href)
             if match:
                 return match.group(1)
+
+    def render(self, width=None, height=None):
+        ctx = dict(href=self.href, name=self.name, width=width or 256, height=height or 128)
+        if self.is_image():
+            return '<img width="%(width)s" src="%(href)s" title="%(name)s"></img>' % ctx
+        video = self.get_youtube_video()
+        if video:
+            ctx['video'] = video
+            return ('<iframe class="youtube-player" type="text/html"'
+                    ' width="%(width)s" height="%(height)s" frameborder="0"'
+                    ' src="http://www.youtube.com/embed/%(video)s">'
+                    '</iframe>') % ctx
+        return '<a target="_" href="%(href)s">%(name)s</a>' % ctx
+
+    render.allow_tags = True
 
 
 _VIDEO_LOCATION_FRONT_PAGE = 'FP'
@@ -244,7 +258,7 @@ class ContactDetail(Contact):
     
     def get_absolute_url(self):
         if hasattr(self, 'org'):
-            return reverse('org_page', args=[self.org.slug])
+            return self.org.get_absolute_url()
         return reverse('about_storyteller', args=[self.user.username])
     
     def __unicode__(self):
@@ -281,7 +295,16 @@ class Org(ContactDetail):
         except:
             pass
         return None
-            
+
+    def ordered_links(self):
+        return self.links.all().order_by('order')
+
+    def ordered_ribbon_links(self):
+        return self.ribbon_links.all().order_by('order')
+
+    def get_absolute_url(self):
+        return reverse('org_page', args=[self.slug])
+
     def __unicode__(self):
         return u"Org %s (%s)" % (self.user, self.organization)
     

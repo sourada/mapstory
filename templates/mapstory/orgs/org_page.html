@@ -91,7 +91,7 @@
     </div>
     <div class="span4">
         <div class="box" id="orglinks">
-            {% edit_widget links %}
+            <a href="{% url org_links org.slug %}" class='btn btn-small' target="_">Edit</a>
             
             <ul data-content="org_links">
                 {% for l in org.links.all %}
@@ -102,7 +102,8 @@
     </div>
 </div>
 <div id="mediabanner" class="box mrg-btm">
-    {% edit_widget media %}
+    <a href="{% url org_ribbon_links org.slug %}" class='btn btn-small' target="_">Edit</a>
+    
     <ul id="carousel" data-content="org_ribbon_links">
         <div class="arrow arrow-left" style="left:15px">&#8826;</div>
         <div class="arrow arrow-right" style="right:15px">&#8827;</div>
@@ -172,7 +173,7 @@
             <textarea style="width:165px;height:130px;resize:both">{{ org_content|default:""}}</textarea>
         </div>
         <div id="edit_org_links">
-            {% for l in org.links.all %}
+            {% for l in org.ordered_links %}
             <div class="link_edit">
                 <input type="hidden" value="{{l.pk}}">
                 <input value="{{l.name}}">
@@ -181,7 +182,7 @@
             {% endfor %}
         </div>
         <div id="edit_org_ribbon_links">
-            {% for l in org.ribbon_links.all %}
+            {% for l in org.ordered_links %}
             <div class="link_edit">
                 <input type="hidden" value="{{l.pk}}">
                 <input value="{{l.name}}">

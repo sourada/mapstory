@@ -28,7 +28,14 @@ class SectionAdmin(admin.ModelAdmin):
     list_editable = 'name','order'
     form = SectionForm
     ordering = ['order',]
-    
+
+
+class LinkAdmin(admin.ModelAdmin):
+    list_display = 'id','name','href','order','render'
+    list_display_links = 'id',
+    list_editable = 'name','href','order'
+
+
 class VideoLinkForm(forms.ModelForm):
     text = forms.CharField(widget=forms.Textarea)
     class Meta:
@@ -61,4 +68,4 @@ admin.site.register(Resource, ResourceAdmin)
 admin.site.register(Org, OrgAdmin)
 admin.site.register(OrgContent, OrgContentAdmin)
 admin.site.register(Topic)
-admin.site.register(Link)
+admin.site.register(Link, LinkAdmin)
