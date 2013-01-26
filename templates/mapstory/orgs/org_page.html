@@ -61,6 +61,14 @@
         bottom: 2px;
         right: 2px;
     }
+    #carousel {
+
+    }
+    #carousel .tile {
+        height: auto;
+        margin-top: 0;
+        border: none;
+    }
 </style>
 {% endblock %}
 
@@ -83,34 +91,26 @@
     </div>
     <div class="span4">
         <div class="box" id="orglinks">
-            {% edit_widget links %}
+            <a href="{% url org_links org.slug %}" class='btn btn-small' target="_">Edit</a>
             
             <ul data-content="org_links">
-            {% if org.links.count %}
                 {% for l in org.links.all %}
-                <li><a href="{{l.href}}">{{l.name}}</a></li>
+                <li id="org-link-{{ l.pk }}"><a href="{{l.href}}">{{l.name}}</a></li>
                 {% endfor %}
-            {% else %}
-                <li>Links PlaceHolder</li>
-                <li>Links PlaceHolder</li>
-                <li>Links PlaceHolder</li>
-            {% endif %}
             </ul>
-
         </div>
     </div>
 </div>
 <div id="mediabanner" class="box mrg-btm">
-    {% edit_widget media %}
-    <ul data-content="org_ribbon_links">
-        {% if org.links.count %}
-            {% for l in org.links.all %}
-            <li><img src="{{l.href}}"></li>
+    <a href="{% url org_ribbon_links org.slug %}" class='btn btn-small' target="_">Edit</a>
+    
+    <ul id="carousel" data-content="org_ribbon_links">
+        <div class="arrow arrow-left" style="left:15px">&#8826;</div>
+        <div class="arrow arrow-right" style="right:15px">&#8827;</div>
+        {% if org.ribbon_links.count %}
+            {% for l in org.ribbon_links.all %}
+            <li class="tile" id="ribbon-link-{{ l.pk }}">{% render_link l %}</li>
             {% endfor %}
-        {% else %}
-            <li>Media Placeholder</li>
-            <li>Media Placeholder</li>
-            <li>Media Placeholder</li>
         {% endif %}
     </ul>
 </div>
@@ -172,6 +172,25 @@
             <label>The content : </label>
             <textarea style="width:165px;height:130px;resize:both">{{ org_content|default:""}}</textarea>
         </div>
+        <div id="edit_org_links">
+            {% for l in org.ordered_links %}
+            <div class="link_edit">
+                <input type="hidden" value="{{l.pk}}">
+                <input value="{{l.name}}">
+                <input value="{{l.href}}">
+            </div>
+            {% endfor %}
+        </div>
+        <div id="edit_org_ribbon_links">
+            {% for l in org.ordered_links %}
+            <div class="link_edit">
+                <input type="hidden" value="{{l.pk}}">
+                <input value="{{l.name}}">
+                <input value="{{l.href}}">
+                {% render_link l %}
+            </div>
+            {% endfor %}
+        </div>
     </div>
     <div id="editbuttons">
         <span id="editmsg"></span>
@@ -186,5 +205,5 @@
 {% if can_edit %}
 <script type="text/javascript" src="{% static "script/org_edit.js" %}"></script>
 {% endif %}
-
+<script type="text/javascript" src="{% static "script/carousel_jquery.js" %}"></script>
 {% endblock %}

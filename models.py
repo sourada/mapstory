@@ -1,9 +1,11 @@
 from itertools import chain
 import random
 import operator
+import os
 import re
 import logging
 import time
+import urlparse
 
 from django.conf import settings
 from django.core.cache import cache
@@ -182,11 +184,43 @@ class Section(models.Model):
     def __unicode__(self):
         return 'Section %s' % self.name
 
-    
+
 class Link(models.Model):
     name = models.CharField(max_length=64)
     href = models.CharField(max_length=256)
     order = models.IntegerField(default=0, blank=True, null=True)
+
+    def is_image(self):
+        ext = os.path.splitext(self.href)[1][1:].lower()
+        return ext in ('gif','jpg','jpeg','png')
+
+    def get_youtube_video(self):
+        prefix = 'https?://(?:w{3}\.)?'
+        pats = (
+            'youtube.com/watch\?v=(\w+)',
+            'youtu.be/(\w+)',
+            'youtube.com/embed/(\w+)',
+        )
+        for p in pats:
+            match = re.match(prefix + p, self.href)
+            if match:
+                return match.group(1)
+
+    def render(self, width=None, height=None):
+        ctx = dict(href=self.href, name=self.name, width=width or 256, height=height or 128)
+        if self.is_image():
+            return '<img width="%(width)s" src="%(href)s" title="%(name)s"></img>' % ctx
+        video = self.get_youtube_video()
+        if video:
+            ctx['video'] = video
+            return ('<iframe class="youtube-player" type="text/html"'
+                    ' width="%(width)s" height="%(height)s" frameborder="0"'
+                    ' src="http://www.youtube.com/embed/%(video)s">'
+                    '</iframe>') % ctx
+        return '<a target="_" href="%(href)s">%(name)s</a>' % ctx
+
+    render.allow_tags = True
+
 
 _VIDEO_LOCATION_FRONT_PAGE = 'FP'
 _VIDEO_LOCATION_HOW_TO = 'HT'
@@ -239,7 +273,7 @@ class ContactDetail(Contact):
     
     def get_absolute_url(self):
         if hasattr(self, 'org'):
-            return reverse('org_page', args=[self.org.slug])
+            return self.org.get_absolute_url()
         return reverse('about_storyteller', args=[self.user.username])
     
     def __unicode__(self):
@@ -266,7 +300,26 @@ class Org(ContactDetail):
         self.slug = defaultfilters.slugify(slugtext)
         models.Model.save(self)
 
-            
+    def get_link(self, link_id):
+        try:
+            return self.links.get(id = link_id)
+        except:
+            pass
+        try:
+            return self.ribbon_links.get(id = link_id)
+        except:
+            pass
+        return None
+
+    def ordered_links(self):
+        return self.links.all().order_by('order')
+
+    def ordered_ribbon_links(self):
+        return self.ribbon_links.all().order_by('order')
+
+    def get_absolute_url(self):
+        return reverse('org_page', args=[self.slug])
+
     def __unicode__(self):
         return u"Org %s (%s)" % (self.user, self.organization)
     

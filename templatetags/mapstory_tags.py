@@ -21,6 +21,7 @@ from mapstory.views import _related_stories_pager
 from dialogos.templatetags import dialogos_tags
 
 import re
+import os
 
 register = template.Library()
 
@@ -324,6 +325,15 @@ def activity_notifier(user):
         cnted = user.useractivity.other_actor_actions.count()
         if cnted:
             return '<span title="Recent Activity" class="actnot">(%s)</span>' % cnted
+
+
+@register.simple_tag
+def render_link(link, width=None, height=None):
+    '''Render a 'link' as best as possible. This means either an img element,
+    a youtube embedded viewer, or a default link. Ideally, support oembed.
+    '''
+    return link.render(width, height)
+
 
 @register.simple_tag
 def layer_language_selector(layer):
