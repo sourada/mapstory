@@ -13,7 +13,6 @@ from mapstory.util import render_manual
 from mapstory.forms import CheckRegistrationForm
 from mapstory.forms import StyleUploadForm
 from mapstory.forms import LayerForm
-from mapstory.templatetags import mapstory_tags
 import account.views
 
 from django.contrib.auth.models import User
