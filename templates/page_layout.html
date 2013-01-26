@@ -14,7 +14,7 @@
     <link href='http://fonts.googleapis.com/css?family=Marvel:700italic' rel='stylesheet' type='text/css'>
     <![endif]-->
     <link href='http://fonts.googleapis.com/css?family=Marvel:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="{% static "geonode/externals/ext/resources/css/ext-all.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{{GEONODE_CLIENT_LOCATION}}/externals/ext/resources/css/ext-all.css" />
     <link rel="stylesheet" type="text/css" href="{% static "theme/geonode.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "theme/ext-theme.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "theme/site.css" %}" media="screen" />    
@@ -42,11 +42,11 @@
 
             {% if user.is_authenticated %}
                 <a id="login-link" href="{% url auth_logout %}">{% trans "Log out" %}</a>
-                <div class="user">{% activity_notifier user %}<a href="{% url about_storyteller user.username %}">Welcome {{ user.username }}</a></div>
+                <div class="user">{% activity_notifier user %}<a title="About You, The StoryTeller" href="{% url about_storyteller user.username %}">Welcome {{ user.username }}</a></div>
             {% else %}
                 <a id="login-link" href="#login-form-pop">{% trans "Log in" %}</a>
                 <div class="user">
-                {% if REGISTRATION_OPEN %} 
+                {% if ACCOUNT_OPEN_SIGNUP %}
                 <a href="{% url account_signup %}">{% trans "Register" %}</a>
                 {% else %}
                 <a href="http://wiki.mapstory.org">Learn More</a>
@@ -148,6 +148,9 @@
 {% block body_base %}
     <div id="main">
       <div class="container">
+        {% block announcements %}
+            {% mapstory_announcements %}
+        {% endblock %}
         {% block main %}{% endblock %}
         {% block content %}{% endblock %}
         {% block sidebar %}{% endblock %}
@@ -171,6 +174,7 @@
                     </div>
                 </div>
             {% endblock %}
+
             {% comment %}
             {% block ads %}
                 <div class="row">
