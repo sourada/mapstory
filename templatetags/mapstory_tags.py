@@ -1,5 +1,6 @@
 from django import template
 from django.template import loader
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Page
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
@@ -359,6 +360,18 @@ def storyteller_tile(user):
     ctx = dict(user=user, map_cnt=Map.objects.filter(owner=user).count(),
                layer_cnt=Layer.objects.filter(owner=user).count())
     return loader.render_to_string('mapstory/_user_tile.html', ctx)
+
+@register.simple_tag
+def profile_incomplete(user):
+    try:
+        incomplete = getattr(user, 'profileincomplete', None)
+    except ObjectDoesNotExist:
+        incomplete = None
+    if incomplete:
+        return loader.render_to_string('mapstory/_profile_incomplete.html',
+                                   {'incomplete' : incomplete})
+    return ''
+
 
 @register.simple_tag
 def warn_status(req, obj):
