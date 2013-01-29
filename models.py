@@ -515,12 +515,9 @@ def audit_layer_metadata(layer):
     
 def user_saved(instance, sender, **kw):
     if kw['created']:
-<<<<<<< HEAD
-        ContactDetail.objects.get_or_create(user = instance)
-=======
-        cd = ContactDetail.objects.create(user = instance)
+        cd = ContactDetail.objects.get_or_create(user = instance)
         cd.update_audit()
->>>>>>> master
+
 
 def create_publishing_status(instance, sender, **kw):
     if kw['created']:
