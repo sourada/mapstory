@@ -6,6 +6,8 @@ import re
 import logging
 import time
 import urlparse
+import urllib
+import json
 
 from django.conf import settings
 from django.core.cache import cache
@@ -18,6 +20,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.core.urlresolvers import reverse
 from django.template import defaultfilters
+from django.utils.hashcompat import md5_constructor
 
 from django.contrib.auth.models import User
 
@@ -275,13 +278,26 @@ class ContactDetail(Contact):
     def audit(self):
         '''return a list of what is needed to 'complete' the profile'''
         incomplete = []
-        if self.user.avatar_set.filter(primary=True).count() == 0:
+        if self._has_avatar():
             incomplete.append('Picture/Avatar')
         if not all([self.user.first_name, self.user.last_name]):
             incomplete.append('Full Name')
         if not self.blurb:
             incomplete.append('Blurb')
         return incomplete
+
+    def _has_avatar(self):
+        cnt = self.user.avatar_set.filter(primary=True).count()
+        if cnt > 0: return True
+        md5 = md5_constructor(self.user.email).hexdigest()
+        url = "http://en.gravatar.com/%s.json" % md5
+        try:
+            # @todo be nicer if this fails?
+            resp = urllib.urlopen(url)
+            json.loads(resp.read())
+            return True
+        except:
+            return False
 
     def update_audit(self):
         incomplete = self.audit()
@@ -499,7 +515,12 @@ def audit_layer_metadata(layer):
     
 def user_saved(instance, sender, **kw):
     if kw['created']:
+<<<<<<< HEAD
         ContactDetail.objects.get_or_create(user = instance)
+=======
+        cd = ContactDetail.objects.create(user = instance)
+        cd.update_audit()
+>>>>>>> master
 
 def create_publishing_status(instance, sender, **kw):
     if kw['created']:
