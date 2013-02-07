@@ -1,4 +1,3 @@
-from itertools import chain
 import random
 import operator
 import os
@@ -34,6 +33,7 @@ from geonode.upload.signals import upload_complete
 
 from mapstory import gwc_config
 
+from avatar.signals import avatar_updated
 from hitcount.models import HitCount
 from agon_ratings.models import OverallRating
 from agon_ratings.categories import RATING_CATEGORY_LOOKUP
@@ -278,7 +278,7 @@ class ContactDetail(Contact):
     def audit(self):
         '''return a list of what is needed to 'complete' the profile'''
         incomplete = []
-        if self._has_avatar():
+        if not self._has_avatar():
             incomplete.append('Picture/Avatar')
         if not all([self.user.first_name, self.user.last_name]):
             incomplete.append('Full Name')
@@ -389,27 +389,27 @@ class Resource(models.Model):
         
     def get_absolute_url(self):
         return reverse('mapstory_resource',args=[self.slug])
-    
+
+
 class FavoriteManager(models.Manager):
-    
+
     def favorites_for_user(self, user):
         return self.filter(user=user)
-    
+
     def favorite_maps_for_user(self, user):
         content_type = ContentType.objects.get_for_model(Map)
         return self.favorites_for_user(user).filter(content_type=content_type)
-    
+
     def create_favorite(self, content_object, user):
         content_type = ContentType.objects.get_for_model(type(content_object))
-        favorite = Favorite(
+        favorite, _ = self.get_or_create(
             user=user,
             content_type=content_type,
             object_id=content_object.pk,
-            content_object=content_object,
             )
-        favorite.save()
         return favorite
-    
+
+
 class Favorite(models.Model):
     user = models.ForeignKey(User)
     content_type = models.ForeignKey(ContentType)
@@ -557,7 +557,11 @@ def remove_favorites(instance, sender, **kw):
 def create_user_activity(sender, instance, created, **kw):
     if created:
         UserActivity.objects.create(user=instance)
-        
+
+
+def audit_profile(sender, user, avatar, **kw):
+    user.get_profile().update_audit()
+
 
 signals.post_save.connect(create_user_activity, sender=User)
 
@@ -582,3 +586,5 @@ signals.post_save.connect(create_hitcount, sender=Layer)
 
 # @todo hackity hack - throw out acl cache on Layer addition
 signals.post_save.connect(clear_acl_cache, sender=Layer)
+
+avatar_updated.connect(audit_profile, sender=None)

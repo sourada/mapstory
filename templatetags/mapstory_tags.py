@@ -362,14 +362,14 @@ def storyteller_tile(user):
     return loader.render_to_string('mapstory/_user_tile.html', ctx)
 
 @register.simple_tag
-def profile_incomplete(user):
+def profile_incomplete(user, show_link=True):
     try:
         incomplete = getattr(user, 'profileincomplete', None)
     except ObjectDoesNotExist:
         incomplete = None
     if incomplete:
         return loader.render_to_string('mapstory/_profile_incomplete.html',
-                                   {'incomplete' : incomplete})
+                                   {'incomplete' : incomplete, 'show_link': show_link})
     return ''
 
 
