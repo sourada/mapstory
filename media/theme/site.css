@@ -2146,3 +2146,21 @@ h2.icn-storylayer span, h2.icn-mapstory span {
     width: 80%;
     resize: both;
 }
+
+
+.xtb-text {
+    color: #fff;
+}
+.x-combo-list {
+    color: #fff;
+}
+
+.x-tab-panel-body {
+    background: #1f2730;
+}
+.x-grid3-row-over {
+    color: #000;
+}
+.gxp-export-section {
+    color: #fff;
+}
