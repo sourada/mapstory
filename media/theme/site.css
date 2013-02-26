@@ -2164,3 +2164,10 @@ h2.icn-storylayer span, h2.icn-mapstory span {
 .gxp-export-section {
     color: #fff;
 }
+
+.x-tip-body {
+    color: #fff !important;
+}
+.timeline-event-label {
+    color: #000;
+}
