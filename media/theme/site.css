@@ -2168,6 +2168,11 @@ h2.icn-storylayer span, h2.icn-mapstory span {
 .x-tip-body {
     color: #fff !important;
 }
+
+.x-panel-body label {
+    color: #fff;
+}
+
 .timeline-event-label {
     color: #000;
 }
