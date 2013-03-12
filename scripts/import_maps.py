@@ -49,6 +49,12 @@ def import_maps(gs_data_dir, conn, zipfile,
     import_models(temppath('maps.json'), add_owner=True)
     print 'importing map layers'
     maplayer_models = import_models(temppath('maplayers.json'))
+    print 'importing users'
+    map_comment_models = import_models(temppath('comment_users.json'))
+    print 'importing map comments'
+    map_comment_models = import_models(temppath('map_comments.json'))
+    print 'importing map publishing status'
+    map_comment_models = import_models(temppath('map_publishing_status.json'))
 
     print 'importing map thumb specs'
     with open(temppath('map_thumb_specs.json')) as f:
@@ -118,6 +124,9 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
     if len(args) != 1:
         parser.error('please provide the maps import zip file')
+    
+    if not os.path.exists(options.data_dir):
+        parser.error("geoserver data directory %s not found" % options.data_dir)
 
     conn = psycopg2.connect("dbname='" + settings.DB_DATASTORE_DATABASE + 
                             "' user='" + settings.DB_DATASTORE_USER + 
