@@ -17,6 +17,7 @@ from django.db.models import signals
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
 from django.template import defaultfilters
 from django.utils.hashcompat import md5_constructor
@@ -229,43 +230,33 @@ class Link(models.Model):
             if match:
                 return match.group(1)
 
-    def render(self, width=None, height=None):
-        if width and height:
-            xwidth = "width='%s'" % width
-            xheight = "height='%s'" % height 
-            style = "style='height:%spx !important; width:%spx !important;'" % (width, height)
-        elif height and width == None:
-            xwidth = ""
-            xheight = "height='%s'" % height 
-            style = "style='height:%spx !important;'" % height
-        elif width and height == None:
-            xwidth = "width='%s'" % width 
-            xheight = ""
-            style = "style='width:%spx !important;'" % width
-        else:
-            xwidth = "width='256'"
-            xheight = "height='128'"
-            style = "style='width:256px !important;height:128px !important;'"
-        ctx = dict(href=self.href, name=self.name, width=xwidth, height=xheight, style=style)
+    def render(self, width=None, height=None, css_class=None):
+        '''width and height are just hints - ignored for images'''
+
+        ctx = dict(href=self.href, link_content=self.name, css_class=css_class, width='', height='')
         if self.is_image():
-            return '<img %(style)s %(width)s %(height)s src="%(href)s" title="%(name)s"></img>' % ctx
+            return '<img class="%(css_class)s" src="%(href)s" title="%(link_content)s"></img>' % ctx
+
         video = self.get_youtube_video()
         if video:
             ctx['video'] = video
+            ctx['width'] = 'width="%s"' % width
+            ctx['height'] = 'height="%s"' % height
             return ('<iframe class="youtube-player" type="text/html"'
                     ' %(width)s %(height)s frameborder="0"'
                     ' src="http://www.youtube.com/embed/%(video)s">'
                     '</iframe>') % ctx
 
-        twitter = self.get_twitter_link()
-        if twitter:
-            return '<a target="_" href="%(href)s"><img src="/static/img/twitter.png" border=0></a>' % ctx
+        known_links = [
+            (self.get_twitter_link, static('img/twitter.png')),
+            (self.get_facebook_link, static('img/facebook.png')),
+        ]
+        for fun, icon in known_links:
+            if fun():
+                ctx['link_content'] = '<img src="%s" border=0>' % icon
+                break
 
-        facebook = self.get_facebook_link()
-        if facebook:
-            return '<a target="_" href="%(href)s"><img src="/static/img/facebook.png" border=0></a>' % ctx
-
-        return '<a target="_" href="%(href)s">%(name)s</a>' % ctx
+        return '<a target="_" href="%(href)s">%(link_content)s</a>' % ctx
 
     render.allow_tags = True
 

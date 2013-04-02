@@ -330,11 +330,11 @@ def activity_notifier(user):
 
 
 @register.simple_tag
-def render_link(link, width=None, height=None):
+def render_link(link, width=None, height=None, css_class=None):
     '''Render a 'link' as best as possible. This means either an img element,
     a youtube embedded viewer, or a default link. Ideally, support oembed.
     '''
-    return link.render(width, height)
+    return link.render(width, height, css_class)
 
 
 @register.simple_tag

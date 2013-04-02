@@ -62,12 +62,15 @@
         right: 2px;
     }
     #carousel {
-
+        height: 220px;
     }
     #carousel .tile {
         height: auto;
         margin-top: 0;
+        padding: 0;
         border: none;
+        width: 256px;
+        text-align: center;
     }
     #quicksearch-div {
         position: relative;
@@ -113,11 +116,11 @@
     {% if can_edit %}<a href="{% url org_ribbon_links org.slug %}" class='btn btn-small' target="_">Edit</a>{% endif %}
     
     <ul id="carousel" data-content="org_ribbon_links">
-        <div class="arrow arrow-left" style="left:15px">&#8826;</div>
-        <div class="arrow arrow-right" style="right:15px">&#8827;</div>
+        <div class="arrow arrow-left" style="left:0px">&#8826;</div>
+        <div class="arrow arrow-right" style="right:0px">&#8827;</div>
         {% if org.ribbon_links.count %}
             {% for l in org.ribbon_links.all %}
-            <li class="tile" id="ribbon-link-{{ l.pk }}">{% render_link l height=200 %}</li>
+            <li class="tile" id="ribbon-link-{{ l.pk }}">{% render_link l width=256 %}</li>
             {% endfor %}
         {% endif %}
     </ul>
@@ -216,4 +219,12 @@
 <script type="text/javascript" src="{% static "script/carousel_jquery.js" %}"></script>
 <script type="text/javascript" src="{% static "script/jquery.expander.min.js" %}"></script>
 <script type="text/javascript" src="{% static "script/expander.js" %}"></script>
+<script type="text/javascript">
+$(function() {
+    var mw = 256.0, mh = 200.0;
+    $("#carousel li *").load(function() {
+       $(this).carouselResize(mw, mh);
+    });
+});
+</script>
 {% endblock %}
