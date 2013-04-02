@@ -319,6 +319,14 @@ class ContactDetail(Contact):
         else:
             ProfileIncomplete.objects.filter(user=self.user_id).delete()
 
+    @property
+    def display_name(self):
+        if self.user.first_name:
+            name = '%s %s' % (self.user.first_name,self.user.last_name)
+        else:
+            name = self.user.username
+        return name
+
     def get_absolute_url(self):
         if hasattr(self, 'org'):
             return self.org.get_absolute_url()
