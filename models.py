@@ -209,17 +209,62 @@ class Link(models.Model):
             if match:
                 return match.group(1)
 
+    def get_twitter_link(self):
+        prefix = 'https?://(?:w{3}\.)?'
+        paths = (
+            'twitter.com/(\w+)',
+        )
+        for p in paths:
+            match = re.match(prefix + p, self.href)
+            if match:
+                return match.group(1)
+    
+    def get_facebook_link(self):
+        prefix = 'https?://(?:w{3}\.)?'
+        paths = (
+            'facebook.com/(\w+)',
+        )
+        for p in paths:
+            match = re.match(prefix + p, self.href)
+            if match:
+                return match.group(1)
+
     def render(self, width=None, height=None):
-        ctx = dict(href=self.href, name=self.name, width=width or 256, height=height or 128)
+        if width and height:
+            xwidth = "width='%s'" % width
+            xheight = "height='%s'" % height 
+            style = "style='height:%spx !important; width:%spx !important;'" % (width, height)
+        elif height and width == None:
+            xwidth = ""
+            xheight = "height='%s'" % height 
+            style = "style='height:%spx !important;'" % height
+        elif width and height == None:
+            xwidth = "width='%s'" % width 
+            xheight = ""
+            style = "style='width:%spx !important;'" % width
+        else:
+            xwidth = "width='256'"
+            xheight = "height='128'"
+            style = "style='width:256px !important;height:128px !important;'"
+        ctx = dict(href=self.href, name=self.name, width=xwidth, height=xheight, style=style)
         if self.is_image():
-            return '<img width="%(width)s" src="%(href)s" title="%(name)s"></img>' % ctx
+            return '<img %(style)s %(width)s %(height)s src="%(href)s" title="%(name)s"></img>' % ctx
         video = self.get_youtube_video()
         if video:
             ctx['video'] = video
             return ('<iframe class="youtube-player" type="text/html"'
-                    ' width="%(width)s" height="%(height)s" frameborder="0"'
+                    ' %(width)s %(height)s frameborder="0"'
                     ' src="http://www.youtube.com/embed/%(video)s">'
                     '</iframe>') % ctx
+
+        twitter = self.get_twitter_link()
+        if twitter:
+            return '<a target="_" href="%(href)s"><img src="/static/img/twitter.png" border=0></a>' % ctx
+
+        facebook = self.get_facebook_link()
+        if facebook:
+            return '<a target="_" href="%(href)s"><img src="/static/img/facebook.png" border=0></a>' % ctx
+
         return '<a target="_" href="%(href)s">%(name)s</a>' % ctx
 
     render.allow_tags = True
