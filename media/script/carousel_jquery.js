@@ -9,7 +9,10 @@
         idx = 0, timeout = 5000,
         handle, arrows;
 
-        if (tiles.length == 0) return;
+        if (tiles.length <= 3) {
+            carousel.children('.arrow').hide();
+            return;
+        }
         function tile(off) {
             var tidx = idx + off;
             if (off < 0) tidx += tiles.length;
