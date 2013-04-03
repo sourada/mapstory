@@ -1,4 +1,4 @@
-{% extends "no_bottom_layout.html" %}
+{% extends "minimized_header_no_bottom_layout.html" %}
 {% load org_tags %}
 {% load mapstory_tags %}
 {% load staticfiles %}
@@ -68,6 +68,14 @@
         height: auto;
         margin-top: 0;
         border: none;
+    }
+    #quicksearch-div {
+        position: relative;
+        top: -50px;
+        left: -240px;
+    }
+    #header .wrap {
+        padding-bottom: 12px;
     }
 </style>
 {% endblock %}
