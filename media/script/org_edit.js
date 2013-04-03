@@ -26,7 +26,7 @@ $(function() {
 
     function startEdit(el) {
         var action = el.attr('data-content'),
-            parent = el.parent('.box'),
+            parent = el.closest('.box'),
             position = parent.position();
         currentContent = el;
         widget.children('div').hide();
