@@ -53,15 +53,18 @@
                 {% endif %}
                 </div>
             {% endif %}
+            <div id="quicksearch-div">
             <form id="quicksearch" action="{% url new_search %}" method="POST">
             {% csrf_token %}
             <label for="q">Quick Search</label>
             <input name="q" value="" autocomplete="off"/>
             </form>
+            </div>
         </div>
         {% include "_login_form.html" %}
       </div><!-- /.wrap -->
     </div><!-- /#header -->
+    {% block menu %}
     <div id="top-crossbar">
        <div class="wrap selfclear">
         <ul class="fancyfont">
@@ -120,6 +123,7 @@
 
       </div><!-- /.wrap -->
     </div><!-- /#crossbar -->
+    {% endblock %}
     
     {# browser compat msgs #}
     {% if page.old_browser %}

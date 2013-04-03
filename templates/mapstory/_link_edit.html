@@ -1,0 +1,35 @@
+{% load mapstory_tags %}
+
+<div class="box mrg-top mrg-btm">
+{% for l in links %}
+<div class="tile media" id="link-{{l.id}}">
+    <div class="details">
+        <div>Name: <span class="name">{{ l.name }}</span></div>
+        <div>URL: <span class="href">{{ l.href }}</span></div>
+        <div>Order: <span class="order">{{ l.order|default_if_none:'0' }}</span></div>
+    </div>
+    <div class="link">
+    {% render_link l %}
+    </div>
+</div>
+{% endfor %}
+</div>
+
+<div id="linkedit" class="box">
+    {% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+    <form method="POST" action="">
+        <label for="name">Name</label>
+        <input name="name" type="text">
+        <label for="href">URL</label>
+        <input name="href" type="text">
+        <label for="order">Order</label>
+        <input name="order" type="text">
+        <input name="id" type="hidden">
+        <br>
+        <input class="btn" type="submit" value="Add">
+        <button style="display:none" id="delete" class="btn">Delete</button>
+        {% csrf_token %}
+    </form>
+</div>

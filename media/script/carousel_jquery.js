@@ -52,7 +52,31 @@
             align(false);
             go(false);
         });
-    }
+    };
+
+    $.fn.carouselResize = function(mw, mh) {
+        var el = this,
+            w = el.width(),
+            h = el.height(),
+            rw = w / mw,
+            rh = h / mh,
+            r = Math.max(rw, rh);
+        if (r > 1) {
+            if (r == rw) {
+                w = mw;
+                h = mh / r;
+            } else {
+                h = mh;
+                w = mw / r;
+            }
+            el.width(w);
+            el.height(h);
+        }
+        if (h < mh) {
+            el.css({margin: (mh - h) / 2 + "px 0"});
+        }
+
+    };
 
     $(function () {
         $("#carousel").carousel();
