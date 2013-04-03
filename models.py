@@ -191,44 +191,32 @@ class Section(models.Model):
 
 class Link(models.Model):
     name = models.CharField(max_length=64)
-    href = models.CharField(max_length=256)
+    href = models.URLField(max_length=256)
     order = models.IntegerField(default=0, blank=True, null=True)
 
     def is_image(self):
         ext = os.path.splitext(self.href)[1][1:].lower()
         return ext in ('gif','jpg','jpeg','png')
 
-    def get_youtube_video(self):
+    def _get_link(self, *paths):
         prefix = 'https?://(?:w{3}\.)?'
-        pats = (
-            'youtube.com/watch\?v=(\w+)',
-            'youtu.be/(\w+)',
-            'youtube.com/embed/(\w+)',
-        )
-        for p in pats:
+        for p in paths:
             match = re.match(prefix + p, self.href)
             if match:
                 return match.group(1)
 
-    def get_twitter_link(self):
-        prefix = 'https?://(?:w{3}\.)?'
-        paths = (
-            'twitter.com/(\w+)',
+    def get_youtube_video(self):
+        return self._get_link(
+            'youtube.com/watch\?v=(\w+)',
+            'youtu.be/(\w+)',
+            'youtube.com/embed/(\w+)',
         )
-        for p in paths:
-            match = re.match(prefix + p, self.href)
-            if match:
-                return match.group(1)
+
+    def get_twitter_link(self):
+        return self._get_link('twitter.com/(\w+)')
     
     def get_facebook_link(self):
-        prefix = 'https?://(?:w{3}\.)?'
-        paths = (
-            'facebook.com/(\w+)',
-        )
-        for p in paths:
-            match = re.match(prefix + p, self.href)
-            if match:
-                return match.group(1)
+        return self._get_link('facebook.com/(\w+)')
 
     def render(self, width=None, height=None, css_class=None):
         '''width and height are just hints - ignored for images'''
