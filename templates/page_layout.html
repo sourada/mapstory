@@ -159,51 +159,10 @@
         {% block sidebar %}{% endblock %}
         {% block bottom %}
             {% block resources %}
-                <div class="row">
-                    <div class="span12 mrg-btm">
-                        <div class="box">
-                            <h2>RESOURCES FOR:</h2>
-                            <div class="mini-slider fancyfont">
-                                <div class="slide">
-                                    {% for r in page.resources.value %}
-                                        <a href="{{ r.get_absolute_url }}">{{ r.name }}</a>
-                                        {% if not forloop.last %}
-                                        <span>|</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% cache cache_time 'resource_menu' %}
+                    {% resource_menu %}
+                {% endcache %}
             {% endblock %}
-
-            {% comment %}
-            {% block ads %}
-                <div class="row">
-                    <div class="span12 ads-box">
-                        <div class="ad">
-                            <a href="#">
-                                <img src="{% static "/theme/img/temp/ad1.png" %}" width="300" height="100" alt="Ad1" />
-                            </a>
-                            <p>Advertisement</p>
-                        </div>
-                        <div class="ad">
-                            <a href="#">
-                                <img src="{% static "/theme/img/temp/ad2.png" %}" width="300" height="100" alt="Ad2" />
-                            </a>
-                            <p>Advertisement</p>
-                        </div>
-                        <div class="ad last">
-                            <a href="#">
-                                <img src="{% static "/theme/img/temp/ad3.png" %}" width="300" height="100" alt="Ad3" />
-                            </a>
-                            <p>Advertisement</p>
-                        </div>
-                    </div>
-                </div>
-            {% endblock %}
-            {% endcomment %}
         {% endblock %}
       </div><!-- /.container -->
     </div><!-- /#main -->

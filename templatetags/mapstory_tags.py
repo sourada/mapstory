@@ -12,6 +12,7 @@ from geonode.maps.models import ALL_LANGUAGES
 from mapstory.models import Section
 from mapstory.models import Favorite
 from mapstory.models import PublishingStatus
+from mapstory.models import Resource
 from mapstory.models import PUBLISHING_STATUS_PRIVATE
 from mapstory.models import PUBLISHING_STATUS_LINK
 from mapstory.models import PUBLISHING_STATUS_PUBLIC
@@ -181,6 +182,15 @@ def comments_section(parse, token):
 class CommentsSectionNode(dialogos_tags.ThreadedCommentsNode):
     template_name = 'maps/_widget_comments.html'
 
+
+@register.simple_tag
+def resource_menu(exclude=None):
+    q = Resource.objects.all()
+    if exclude:
+        q = q.exclude(slug=exclude)
+    return loader.render_to_string("mapstory/_resource_menu.html", {
+        'resources' : q
+    })
 
 @register.simple_tag
 def related_mapstories(map_obj):
