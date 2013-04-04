@@ -15,13 +15,25 @@
         padding: 0 .5em;
         background: #F47A20;
         color: white;
+        margin-bottom: 5px;
     }
     #user-activity-feed .item {
+        clear: both;
         border-top: 1px solid #F47A20;
     }
     #user-activity-feed .item p {
         margin-right: 8em;
         padding-right: 1em;
+    }
+    .pagination {
+        height: auto;
+        margin: 0;
+    }
+    .pagination a.more {
+        float: right;
+        border-width: inherit;
+        line-height: inherit;
+        padding: .5em;
     }
 </style>
 {% endblock %}
@@ -68,13 +80,13 @@
                         {% if p.education %}
                         <section>
                             <h6>Education</h6>
-                            <p>{{ p.education|linebreaks }}</p>
+                            <p>{{ p.education|escape|urlize|linebreaks|safe }}</p>
                         </section>
                         {% endif %}
                         {% if p.expertise %}
                         <section>
                             <h6>Expertise</h6>
-                            <p>{{ p.expertise|linebreaks }}</p>
+                            <p>{{ p.expertise|escape|urlize|linebreaks|safe }}</p>
                         </section>
                         {% endif %}
                     </div>
@@ -82,11 +94,13 @@
                         <h2>{% firstof storyteller.get_full_name storyteller.username %}
                         {% if p.organization %},<br/> {{ p.organization }} {% endif %}
                         </h2>
+                        {% if p.biography %}
                         <section>
                             <h3>Biography:</h3>
-                            <p>{{ p.biography|linebreaks }}</p>
+                            <p>{{ p.biography|escape|urlize|linebreaks|safe }}</p>
                         </section>
-                        {% include "mapstory/_activity_feed.html" %}
+                        {% endif %}
+                        {% activity_feed storyteller %}
                     </div>
                 </div>
             </div>
