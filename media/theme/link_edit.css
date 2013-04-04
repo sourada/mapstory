@@ -1,0 +1,26 @@
+.tile img {
+    max-width: 256px;
+}
+.tile {
+    min-height: 8em;
+    padding: 1em;
+}
+.details {
+    float: right;
+}
+.details order {
+    display: none;
+}
+.selected {
+    background: graytext;
+}
+.tile:hover {
+    background: bisque;
+}
+#docs li {
+    font-size: small;
+    list-style: circle outside none;
+}
+#docs ul {
+    margin-left: 2em;
+}

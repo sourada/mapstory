@@ -140,12 +140,15 @@ def section_detail(req, section):
         'section' : sec,
         'pager' : pager
     }))
-    
+
+
 def resource_detail(req, resource):
     res = get_object_or_404(models.Resource, slug=resource)
     return render_to_response('mapstory/resource.html', RequestContext(req,{
+        'can_edit' : req.user.is_superuser,
         'resource' : res
     }))
+
 
 def get_map_carousel_maps():
     '''Get the carousel ids/thumbnail dict either
@@ -593,62 +596,60 @@ def org_page_api(req, org_slug):
         val = filters.urlize(val)
         val = filters.linebreaks(val)
         return HttpResponse(val)
-    # @todo evaluate removal of link part
-    val = req.POST.get('link', None)
-    if val is not None:
-        linkjson = json.loads(val)
-        id = linkjson.get('id', None)
-        if id:
-            link = org.get_link(id)
-            if not link:
-                raise PermissionDenied()
-        else:
-            link = models.Link()
-        if 'delete' in linkjson:
-            link.delete()
-        else:
-            link.name = linkjson.get('name')
-            link.href = linkjson.get('href')
-            link.save()
-            rel = org.links
-            if linkjson.get('type') == 'ribbon':
-                rel = org.ribbon_links
-            rel.add(link)
-        return HttpResponse(json.dumps({'id': link.id}))
     return HttpResponse("Invalid Request", status=400)
+
 
 def org_links(req, org_slug, link_type='links'):
     org = get_object_or_404(models.Org, slug=org_slug)
     if not (req.user is org.user or req.user.is_superuser):
         raise PermissionDenied()
-    # resolve the m2m
-    member = getattr(org, link_type)
+    return _process_links(req, org, 'mapstory/orgs/org_links.html', link_type)
+
+
+def user_links(req, link_type='links'):
+    user = req.user
+    if not (user.is_authenticated() or user.is_superuser):
+        raise PermissionDenied()
+    return _process_links(req, user.get_profile(), 'profiles/edit_links.html',
+                          link_type)
+
+
+def resource_links(req, resource, link_type='links'):
+    res = get_object_or_404(models.Resource, slug=resource)
+    if not req.user.is_superuser:
+        raise PermissionDenied()
+    return _process_links(req, res, 'mapstory/resource_links.html', link_type)
+
+
+def _process_links(req, instance, template, link_type):
     error = ''
+    m2m = getattr(instance, link_type)
     if req.method == 'POST':
         if req.POST['id']:
-            # before updating, make sure the org owns the link
-            link = member.get(id = req.POST['id'])
+            # before updating, make sure the object owns the link
+            # will raise if not
+            link = m2m.get(id = req.POST['id'])
         else:
             link = models.Link()
         if 'delete' in req.POST:
             link.delete()
         else:
-            fields = ('name', 'href', 'order')
+            fields = ('name', 'href')
             if not all([req.POST[f] for f in fields]):
                 error = 'Name and URL are required'
             else:
-                for f in fields: setattr(link, f, req.POST[f])
+                fields += ('order',)
+                for k,v in [ (f, req.POST[f]) for f in fields]:
+                    if v: setattr(link, k, v)
                 link.save()
-                member.add(link)
-
+                m2m.add(link)
     ctx = {
-        'links' : member.all().order_by('order'),
+        'links' : m2m.all().order_by('order'),
         'link_type' : link_type,
-        'org' : org,
+        'obj' : instance,
         'error' : error
     }
-    return render_to_response('mapstory/orgs/org_links.html',
-                              RequestContext(req, ctx))
+    return render_to_response(template, RequestContext(req, ctx))
 
 
 def layer_xml_metadata(req, layer_id):

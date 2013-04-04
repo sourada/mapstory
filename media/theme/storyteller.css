@@ -1,0 +1,27 @@
+#user-activity-feed time {
+    float:right;
+    width: 8em;
+    text-align: center;
+    padding: 0 .5em;
+    background: #F47A20;
+    color: white;
+    margin-bottom: 5px;
+}
+#user-activity-feed .item {
+    clear: both;
+    border-top: 1px solid #F47A20;
+}
+#user-activity-feed .item p {
+    margin-right: 8em;
+    padding-right: 1em;
+}
+.pagination {
+    height: auto;
+    margin: 0;
+}
+.pagination a.more {
+    float: right;
+    border-width: inherit;
+    line-height: inherit;
+    padding: .5em;
+}

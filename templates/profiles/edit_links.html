@@ -3,7 +3,7 @@
 {% load mapstory_tags %}
 {% load staticfiles %}
 
-{% block title %}{{ obj.name }}{% endblock %}
+{% block title %}{{ obj.user.username }}{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" type="text/css" href="{% static "theme/link_edit.css" %}" media="screen" />
@@ -11,19 +11,20 @@
 
 {% block main %}
 
+<a class="pull-right" href="{{ obj.get_absolute_url }}">[ Back ]</a>
 {% if link_type == 'links' %}
-<h2><a href="{{ org.get_absolute_url }}">{{ obj.name }}</a> Links</h2>
+<h2>{{ obj.user.username }}, Links</h2>
 {% else %}
-<h2><a href="{{ org.get_absolute_url }}">{{ obj.name }}</a> Media Links</h2>
+<h2>{{ obj.user.username }} Media Links</h2>
 {% endif %}
 
 <div class="box" id="docs">
     {% if link_type == 'links' %}
-    <p>The links will be displayed on the right side of your organization's page
+    <p>The links will be displayed on the right side of your profile page
     using the provided <em>name</em>.
     </p>
     {% else %}
-    <p>The links will be displayed in the media banner of your organization's page.
+    <p>The links will be displayed in the media banner of your profile page.
     Supported types are:
     <ul>
         <li>Images - the URL must end with an image extension (.jpg, .png, .gif)</li>

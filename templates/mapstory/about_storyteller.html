@@ -7,35 +7,7 @@
 {% block title %}{{storyteller.username}}{% endblock %}
 
 {% block extra_head %}
-<style>
-    #user-activity-feed time {
-        float:right;
-        width: 8em;
-        text-align: center;
-        padding: 0 .5em;
-        background: #F47A20;
-        color: white;
-        margin-bottom: 5px;
-    }
-    #user-activity-feed .item {
-        clear: both;
-        border-top: 1px solid #F47A20;
-    }
-    #user-activity-feed .item p {
-        margin-right: 8em;
-        padding-right: 1em;
-    }
-    .pagination {
-        height: auto;
-        margin: 0;
-    }
-    .pagination a.more {
-        float: right;
-        border-width: inherit;
-        line-height: inherit;
-        padding: .5em;
-    }
-</style>
+<link rel="stylesheet" type="text/css" href="{% static "theme/storyteller.css" %}" media="screen" />
 {% endblock %}
 
 {% block main %}
@@ -54,64 +26,83 @@
         {% endif %}
     </div>
 </div>
-    <div class="row">
-        {% with storyteller.get_profile as p %}
-        <div class="span8">
-            <div class="box mrg-btm">
-                <div class="cols">
-                    <div class="col-side storyteller-info">
-                        {% avatar storyteller %}
-                        <section>
-                            <ul>
-                                {% if p.blurb %}
-                                <li>{{ p.blurb }}</li>
-                                {% endif %}
-                                {% if p.voice %}
-                                <li>{{ p.voice }}</li>
-                                {% endif %}
-                                {% if p.city %}
-                                <li>{{ p.city }}</li>
-                                {% endif %}
-                                {% if p.country %}
-                                <li>{{ p.country }}</li>
-                                {% endif %}
-                            </ul>
-                        </section>
-                        {% if p.education %}
-                        <section>
-                            <h6>Education</h6>
-                            <p>{{ p.education|escape|urlize|linebreaks|safe }}</p>
-                        </section>
-                        {% endif %}
-                        {% if p.expertise %}
-                        <section>
-                            <h6>Expertise</h6>
-                            <p>{{ p.expertise|escape|urlize|linebreaks|safe }}</p>
-                        </section>
-                        {% endif %}
-                    </div>
-                    <div class="col-main storyteller-details">
-                        <h2>{% firstof storyteller.get_full_name storyteller.username %}
-                        {% if p.organization %},<br/> {{ p.organization }} {% endif %}
-                        </h2>
-                        {% if p.biography %}
-                        <section>
-                            <h3>Biography:</h3>
-                            <p>{{ p.biography|escape|urlize|linebreaks|safe }}</p>
-                        </section>
-                        {% endif %}
-                        {% activity_feed storyteller %}
+<div class="row">
+    {% with storyteller.get_profile as p %}
+    <div class="span8">
+        <div class="box mrg-btm">
+            <div class="cols">
+                <div class="col-side storyteller-info">
+                    {% avatar storyteller %}
+                    <section>
+                        <ul>
+                            {% if p.blurb %}
+                            <li>{{ p.blurb }}</li>
+                            {% endif %}
+                            {% if p.voice %}
+                            <li>{{ p.voice }}</li>
+                            {% endif %}
+                            {% if p.city %}
+                            <li>{{ p.city }}</li>
+                            {% endif %}
+                            {% if p.country %}
+                            <li>{{ p.country }}</li>
+                            {% endif %}
+                        </ul>
+                    </section>
+                    {% if p.education %}
+                    <section>
+                        <h6>Education</h6>
+                        <p>{{ p.education|escape|urlize|linebreaks|safe }}</p>
+                    </section>
+                    {% endif %}
+                    {% if p.expertise %}
+                    <section>
+                        <h6>Expertise</h6>
+                        <p>{{ p.expertise|escape|urlize|linebreaks|safe }}</p>
+                    </section>
+                    {% endif %}
+                    <div class="links ">
+                        {% for l in storyteller.get_profile.links.all %}
+                            {% render_link l %}
+                        {% endfor %}
                     </div>
                 </div>
+                <div class="col-main storyteller-details">
+                    <h2>{% firstof storyteller.get_full_name storyteller.username %}
+                    {% if p.organization %},<br/> {{ p.organization }} {% endif %}
+                    </h2>
+                    {% if p.biography %}
+                    <section>
+                        <h3>Biography:</h3>
+                        <p>{{ p.biography|escape|urlize|linebreaks|safe }}</p>
+                    </section>
+                    {% endif %}
+                    {% activity_feed storyteller %}
+                </div>
             </div>
-            {% endwith %}
         </div>
-        <div class="span4">
-            {% by_storyteller storyteller %}
-        </div>
+        {% endwith %}
     </div>
+    <div class="span4">
+        {% by_storyteller storyteller %}
+    </div>
+</div>
+<div id="mediabanner" class="box mrg-btm">
+    {% if can_edit %}<a href="{% url resource_ribbon_links resource.slug %}" class='btn btn-small pull-right' target="_">Edit</a>{% endif %}
+    {{ storyteller.ribbon_links.count }}
+    {% media_ribbon storyteller.get_profile.ribbon_links %}
+</div>
 {% endblock %}
 
 {% block extra_body %}
 <script type="text/javascript" src="{% static "script/paginate.js" %}"></script>
+<script type="text/javascript" src="{% static "script/carousel_jquery.js" %}"></script>
+<script type="text/javascript">
+$(function() {
+    var mw = 256.0, mh = 200.0;
+    $("#carousel li *").load(function() {
+       $(this).carouselResize(mw, mh);
+    });
+});
+</script>
 {% endblock %}

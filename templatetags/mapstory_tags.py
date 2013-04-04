@@ -187,7 +187,7 @@ class CommentsSectionNode(dialogos_tags.ThreadedCommentsNode):
 def resource_menu(exclude=None):
     q = Resource.objects.all()
     if exclude:
-        q = q.exclude(slug=exclude)
+        q = q.exclude(pk=exclude.pk)
     return loader.render_to_string("mapstory/_resource_menu.html", {
         'resources' : q
     })
@@ -385,6 +385,14 @@ def storyteller_tile(user):
     ctx = dict(user=user, map_cnt=Map.objects.filter(owner=user).count(),
                layer_cnt=Layer.objects.filter(owner=user).count())
     return loader.render_to_string('mapstory/_user_tile.html', ctx)
+
+
+@register.simple_tag
+def media_ribbon(links):
+    return loader.render_to_string('mapstory/_media_ribbon.html', {
+        'links' : links
+    })
+
 
 @register.simple_tag
 def profile_incomplete(user, show_link=True):

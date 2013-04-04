@@ -207,16 +207,16 @@ class Link(models.Model):
 
     def get_youtube_video(self):
         return self._get_link(
-            'youtube.com/watch\?v=(\w+)',
-            'youtu.be/(\w+)',
-            'youtube.com/embed/(\w+)',
+            'youtube.com/watch\?v=(\S+)',
+            'youtu.be/(\S+)',
+            'youtube.com/embed/(\S+)',
         )
 
     def get_twitter_link(self):
-        return self._get_link('twitter.com/(\w+)')
+        return self._get_link('twitter.com/(\S+)')
     
     def get_facebook_link(self):
-        return self._get_link('facebook.com/(\w+)')
+        return self._get_link('facebook.com/(\S+)')
 
     def render(self, width=None, height=None, css_class=None):
         '''width and height are just hints - ignored for images'''
@@ -304,6 +304,7 @@ class ContactDetail(Contact):
     education = models.CharField(max_length=512, null=True, blank=True)
     expertise = models.CharField(max_length=256, null=True, blank=True)
     links = models.ManyToManyField(Link, blank=True)
+    ribbon_links = models.ManyToManyField(Link, blank=True, related_name='contactdetail_ribbon_links_set')
 
     def clean(self):
         'override Contact name or organization restriction'
@@ -369,7 +370,6 @@ class ProfileIncomplete(models.Model):
 class Org(ContactDetail):
     slug = models.SlugField(max_length=64, blank=True)
     members = models.ManyToManyField(User, blank=True)
-    ribbon_links = models.ManyToManyField(Link, blank=True)
     banner_image = models.URLField(null=True, blank=True)
     
     def get_absolute_url(self):
@@ -413,12 +413,15 @@ class OrgContent(models.Model):
     name = models.CharField(max_length=32)
     text = models.TextField(null=True, blank=True)
     org = models.ForeignKey(Org)
-    
+
+
 class Resource(models.Model):
     name = models.CharField(max_length=64)
     slug = models.SlugField(max_length=64,blank=True)
     order = models.IntegerField(null=True,blank=True)
     text = models.TextField(null=True)
+    links = models.ManyToManyField(Link, blank=True)
+    ribbon_links = models.ManyToManyField(Link, blank=True, related_name='resource_ribbon_links_set')
 
     def save(self,*args,**kw):
         slugtext = self.name.replace('&','and')

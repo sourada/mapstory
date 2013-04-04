@@ -1,11 +1,46 @@
 {% extends "page_layout.html" %}
+
+{% load mapstory_tags %}
+{% load staticfiles %}
+
 {% block title %}Resources for {{resource.name}}{% endblock %}
 
 {% block main %}
-<div class="row">
+<div class="row mrg-btm mrg-top">
     <div class="span8">
-        <h2 class="mrg-top">Resources for {{resource.name}}</h2>
+        <h2>Resources for {{resource.name}}</h2>
         <p class="box">{{resource.text}}</p>
     </div>
+    <div class="span4">
+        {% if can_edit %}<a href="{% url resource_links resource.slug %}" class='btn btn-small pull-right' target="_">Edit</a>{% endif %}
+        {% if resource.links.count %}
+            <h2 class="dark">Other Resources</h2>
+            <div class="box">
+            {% for l in resource.links.all %}
+                {% render_link l %}
+            {% endfor %}
+            </div>
+        {% endif %}
+    </div>
 </div>
+<div id="mediabanner" class="box mrg-btm">
+    {% if can_edit %}<a href="{% url resource_ribbon_links resource.slug %}" class='btn btn-small pull-right' target="_">Edit</a>{% endif %}
+    {% media_ribbon resource.ribbon_links %}
+</div>
+{% endblock %}
+
+{% block resources %}
+    {% resource_menu exclude=resource %}
+{% endblock %}
+
+{% block extra_body %}
+<script type="text/javascript" src="{% static "script/carousel_jquery.js" %}"></script>
+<script type="text/javascript">
+$(function() {
+    var mw = 256.0, mh = 200.0;
+    $("#carousel li *").load(function() {
+       $(this).carouselResize(mw, mh);
+    });
+});
+</script>
 {% endblock %}
