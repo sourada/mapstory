@@ -19,6 +19,7 @@ from mapstory.models import get_view_cnt_for
 from mapstory.util import render_manual
 from mapstory.views import _by_storyteller_pager
 from mapstory.views import _related_stories_pager
+from mapstory.views import _storyteller_activity_pager
 from dialogos.templatetags import dialogos_tags
 
 import re
@@ -268,7 +269,18 @@ def by_storyteller(obj):
         'maps_pager': maps_page,
         'layers_pager': layers_page
     })
-        
+
+
+@register.simple_tag
+def activity_feed(user):
+    template_name = "mapstory/_activity_feed.html"
+    return loader.render_to_string(template_name, {
+        'user' : user,
+        'action_pager' : _storyteller_activity_pager(user, 'actions').page(1),
+        'other_actions_pager' : _storyteller_activity_pager(user, 'other-actions').page(1)
+    })
+
+
 _link_template = "<a href='%s'>%s</a>"
 _pt_link_template = "%s (%s)"
 absolutize = lambda u: u if u.startswith("http:") else settings.SITEURL[:-1] + u
@@ -281,6 +293,7 @@ def _activity_link(subject, plain_text=False):
     else:
         return subject
     return (_pt_link_template if plain_text else _link_template) % parts
+
 
 @register.simple_tag
 def activity_item(action, show_actor_link=True, plain_text=False):
@@ -318,6 +331,7 @@ def activity_item(action, show_actor_link=True, plain_text=False):
     template = 'mapstory/_activity_item.%s' % ('txt' if plain_text else 'html')
     # user, verb, subject, timestamp, ago
     return loader.render_to_string(template, ctx)
+
 
 @register.simple_tag
 def activity_notifier(user):
