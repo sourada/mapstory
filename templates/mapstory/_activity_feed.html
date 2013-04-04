@@ -2,16 +2,26 @@
 {% load mapstory_tags %}
 
 <div id="user-activity-feed">
-    <section>
-<h3>Recent Activity:</h3>
-{% for action in storyteller.actor_actions.public %}
-    {% activity_item action show_actor_link=False %}
-{% endfor %}
-    </section>
-    <section>
-<h3>Recent Activity of Others:</h3>
-{% for action in storyteller.useractivity.other_actor_actions.all %}
-    {% activity_item action %}
-{% endfor %}
-    </section>
+    {% if action_pager.has_other_pages %}
+    <div class="paginate" data-page-select="article">
+        <h3>Recent Activity:</h3>
+        <section class="paginate-contents article-list">
+            {% for p in action_pager %}
+                {% activity_item p %}
+            {% endfor %}
+        </section>
+        {% pagination action_pager 'storyteller_activity_pager' user.username %}
+    </div>
+    {% endif %}
+    {% if other_action_pager.has_other_pages %}
+    <div class="paginate" data-page-select="article">
+        <h3>Recent Activity of Others:</h3>
+        <section class="paginate-contents article-list">
+            {% for p in other_action_pager %}
+                {% activity_item p show_actor_link=False%}
+            {% endfor %}
+        </section>
+        {% pagination other_action_pager 'storyteller_other_activity_pager' user.username %}
+    </div>
+    {% endif %}
 </div>
