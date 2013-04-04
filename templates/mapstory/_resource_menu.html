@@ -1,0 +1,17 @@
+<div class="row">
+    <div class="span12 mrg-btm">
+        <div class="box">
+            <h2>RESOURCES FOR:</h2>
+            <div class="mini-slider fancyfont">
+                <div class="slide">
+                    {% for r in resources %}
+                    <a href="{{ r.get_absolute_url }}">{{ r.name }}</a>
+                    {% if not forloop.last %}
+                    <span>|</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
