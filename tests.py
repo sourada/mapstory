@@ -91,14 +91,14 @@ class SocialTest(TestCase):
         lyr.publish.save()
 
         comment_on(lyr, self.bobby, 'a comment')
-        expected = ("http://localhost:8000/mapstory/storyteller/bobby (bobby)"
+        expected = ("http://localhost:8000/mapstory/storyteller/bobby/ (bobby)"
         " commented on http://localhost:8000/data/layer1 (the StoryLayer 'example')"
         " [ 0 minutes ago ]")
         actual = mapstory_tags.activity_item(self.bobby.actor_actions.all()[0], plain_text=True)
         self.assertEqual(expected, actual)
 
         rate(lyr, self.bobby, 4)
-        expected = ("http://localhost:8000/mapstory/storyteller/bobby (bobby)"
+        expected = ("http://localhost:8000/mapstory/storyteller/bobby/ (bobby)"
         " gave http://localhost:8000/data/layer1 (the StoryLayer 'example')"
         " a rating of 4 [ 0 minutes ago ]")
         actual = mapstory_tags.activity_item(self.bobby.actor_actions.all()[0], plain_text=True)
