@@ -41,7 +41,7 @@
 <div id="mediabanner" class="box mrg-btm">
     {% if can_edit %}<a href="{% url org_ribbon_links org.slug %}" class='btn btn-small pull-right' target="_">Edit</a>{% endif %}
     
-    {% include "mapstory/_media_ribbon.html" %}
+    {% media_ribbon org.ribbon_links %}
 </div>
 
 <div>
