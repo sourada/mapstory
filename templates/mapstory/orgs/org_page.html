@@ -140,7 +140,7 @@
 <script type="text/javascript">
 $(function() {
     var mw = 256.0, mh = 200.0;
-    $("#carousel li *").load(function() {
+    $("#carousel li *").carouselResize(mw, mh).load(function() {
        $(this).carouselResize(mw, mh);
     });
 });
