@@ -54,7 +54,7 @@ class NamedRedirect(RedirectView):
 
 urlpatterns = patterns('',
     # inject our form into these views
-    ('^profiles/edit', 'profiles.views.edit_profile', {'form_class': ProfileForm,}),
+    ('^profiles/edit$', 'profiles.views.edit_profile', {'form_class': ProfileForm,}),
     ('^profiles/create', 'profiles.views.create_profile', {'form_class': ProfileForm,}),
 )
 
@@ -67,6 +67,9 @@ urlpatterns += patterns('mapstory.views',
     url(r"^account/signup/$", SignupView.as_view(), name="account_signup"),
     # and this from geonode
     url(r'^data/(?P<layername>[^/]*)/metadata$', 'layer_metadata', name="layer_metadata"),
+    # and to make url kinda sane
+    url(r'^profiles/edit/links$', 'user_links', name='user_links'),
+    url(r'^profiles/edit/ribbon$', 'user_links', {'link_type' : 'ribbon_links'}, name='user_ribbon_links'),
     
     # redirect some common geonode stuff
     url(r'^data/$', NamedRedirect.as_view(name='search_layers'), name='data_home'),
@@ -116,6 +119,8 @@ urlpatterns += patterns('mapstory.views',
     url(r'^mapstory/add-to-map/(?P<id>\d+)/(?P<typename>[:\w]+)','add_to_map',name='add_to_map'),
     url(r'^search/favoriteslinks$','favoriteslinks',name='favoriteslinks'),
     url(r'^search/favoriteslist$','favoriteslist',name='favoriteslist'),
+    url(r'^mapstory/resource/(?P<resource>[-\w]+)/links', 'resource_links', name='resource_links'),
+    url(r'^mapstory/resource/(?P<resource>[-\w]+)/ribbon', 'resource_links', {'link_type' : 'ribbon_links'}, name='resource_ribbon_links'),
 
     url(r'^ajax/hitcount/$', update_hit_count_ajax, name='hitcount_update_ajax'),
 

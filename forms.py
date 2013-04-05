@@ -83,7 +83,7 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = ContactDetail
-        exclude = ('user','fax','delivery','zipcode','area','links','name','voice')
+        exclude = ('user','fax','delivery','zipcode','area','links','ribbon_links','name','voice')
         
 
 class CheckRegistrationForm(SignupForm):

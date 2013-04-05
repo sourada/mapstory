@@ -1,0 +1,11 @@
+{% load mapstory_tags %}
+
+<ul id="carousel">
+    {% if links.count %}
+    <div class="arrow arrow-left" style="left:0px">&#8826;</div>
+    <div class="arrow arrow-right" style="right:0px">&#8827;</div>
+        {% for l in links.all %}
+        <li class="tile" id="ribbon-link-{{ l.pk }}">{% render_link l width=256 %}</li>
+        {% endfor %}
+    {% endif %}
+</ul>
