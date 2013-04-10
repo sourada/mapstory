@@ -45,6 +45,9 @@
     #drop-target.drop-hover {
         border: 1px solid #F56600; background: #FCF7F7; color: #333;
     }
+    strong {
+        font-weight: bold;
+    }
 </style>
 {% endblock %}
 
@@ -64,6 +67,7 @@
     <ul class="filetypes">
         <li>ESRI Shapefile (.shp)</li>
         <li>CSV (.csv) with latitude and longitude columns.</li>
+        <li>Raster (.tiff, .png, .jpg) with the timestamp in the file name - only in zip files (<strong>experimental</strong> - {% manual_link "prep-raster" "more details" %})</li>
         <li>Zip (.zip) file containing all files in the top-level directory</li>
     </ul>
     <p>
@@ -173,7 +177,7 @@ setup({
 {% endif %}
 
 <h3>Tips</h3>
-<p>To upload a StoryLayer, the following files are required: *.shp, *.dbf, and
+<p>To upload a Shapefile StoryLayer, the following files are required: *.shp, *.dbf, and
 *.shx. A *.prj is strongly suggested and an optional *.sld file may be provided.
 </p>
 <p>CSV files (<strong>column name headers required</strong>) are also supported.</p>

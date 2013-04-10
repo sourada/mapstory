@@ -44,7 +44,7 @@ class NamedRedirect(RedirectView):
             match =  urlresolvers.get_resolver('geonode.urls').resolve(req.path)
             return match.func(req, *args, **kw)
         else:
-            return RedirectView.post(req, *args, **kw)
+            return RedirectView.post(self, req, *args, **kw)
 
 
 urlpatterns = patterns('',
