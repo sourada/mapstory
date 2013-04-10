@@ -35,6 +35,8 @@ function init(options) {
             case 'tif':
             case 'tiff':
             case 'geotiff':
+            case 'png':
+            case 'jpg':
                 break
             default:
                 ext = null;
@@ -235,6 +237,8 @@ function init(options) {
             case 'tif':
             case 'tiff':
             case 'geotiff':
+            case 'png':
+            case 'jpg':
                 break;
             default:
                 unknownMsg.show();
@@ -298,7 +302,7 @@ function init(options) {
     
     function isMainFile(name) {
         var ext = getExtension(name);
-        return /^(csv|zip|shp|tif|tiff|geotiff)$/i.test(ext);
+        return /^(csv|zip|shp|tif|tiff|geotiff|png|jpg)$/i.test(ext);
     }
     
     function isShapefileComponent(ext) {
