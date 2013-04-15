@@ -362,6 +362,32 @@ def about_storyteller(req, username):
     }))
 
 
+def _storyteller_activity_pager(user, what):
+    if what == 'actions':
+        query = user.actor_actions.public()
+    else:
+        query = user.useractivity.other_actor_actions.all()
+    return Paginator(query, 5, allow_empty_first_page=True)
+
+
+def storyteller_activity_pager(req, username, what='actions'):
+    user = get_object_or_404(User, username=username)
+    from mapstory.templatetags.mapstory_tags import activity_item
+    pager = _storyteller_activity_pager(user, what)
+    page_num = int(req.REQUEST.get('page',1)) if req else 1
+    page = None
+    try:
+        page = pager.page(page_num)
+    except EmptyPage:
+        pass
+    link = tiles =  ''
+    if page:
+        show_link = what != 'actions'
+        tiles = ''.join([activity_item(i, show_link) for i in page])
+        link = "<a href='%s?page=%s' class='next'></a>" % (req.path, page.next_page_number()) if page.has_next() else ''
+    return HttpResponse('<div>%s%s</div>' % (tiles,link))
+
+
 def by_storyteller_pager(req, user, what):
     user = get_object_or_404(User, username=user)
     pager = _by_storyteller_pager(req, user, what)

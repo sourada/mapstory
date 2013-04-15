@@ -18,6 +18,11 @@ from mapstory import social_signals
 from django.contrib import admin
 admin.autodiscover()
 
+import oembed
+oembed.autodiscover()
+from oembed_providers import MapStoryProvider
+oembed.site.register(MapStoryProvider)
+
 js_info_dict = {
     'domain': 'djangojs',
     'packages': ('geonode',)
@@ -45,7 +50,7 @@ class NamedRedirect(RedirectView):
             return match.func(req, *args, **kw)
         else:
             return RedirectView.post(req, *args, **kw)
-    
+
 
 urlpatterns = patterns('',
     # inject our form into these views
@@ -68,10 +73,13 @@ urlpatterns += patterns('mapstory.views',
     url(r'^maps/$', NamedRedirect.as_view(name='search_maps', not_post=True), name='maps_home'),
     # and allow missing slash for uploads
     url(r'^data/upload$', NamedRedirect.as_view(name='data_upload')),
+    # don't use the old registration page
+    url(r'^accounts/register/$', RedirectView.as_view(url='/account/signup/'), name='registration_register'),
 
     (r'', include('geonode.simplesearch.urls')), # put this first to ensure search urls priority
     (r'', include('geonode.urls')),
     url(r"^invites/", include("kaleo.urls")),
+    url(r'^oembed/', include("oembed.urls")),
     
     (r'^data/create_annotations_layer/(?P<mapid>\d+)$','create_annotations_layer'),
     url(r'^mapstory/donate/$',direct_to_template, {"template":"mapstory/donate.html"},name='donate'),
@@ -82,6 +90,8 @@ urlpatterns += patterns('mapstory.views',
     url(r'^mapstory/tile/(?P<mapid>\d+)$','map_tile',name='map_tile'),
     url(r'^mapstory/tiles$','map_tiles',name='map_tiles'),
     url(r'^mapstory/storyteller/(?P<username>\S+)/$','about_storyteller',name='about_storyteller'),
+    url(r'^mapstory/storyteller/(?P<username>\S+)/actions$','storyteller_activity_pager',name='storyteller_activity_pager'),
+    url(r'^mapstory/storyteller/(?P<username>\S+)/other-actions$','storyteller_activity_pager', {'what':'other'}, name='storyteller_other_activity_pager'),
     url(r'^mapstory/section/(?P<section>[-\w]+)/$','section_detail',name='section_detail'),
     url(r'^mapstory/section/(?P<section>[-\w]+)/tiles$','section_tiles',name='section_tiles'),
     url(r'^mapstory/resource/(?P<resource>[-\w]+)/$','resource_detail',name='mapstory_resource'),
@@ -111,7 +121,6 @@ urlpatterns += patterns('mapstory.views',
 
     url(r"^announcements/", include("announcements.urls")),
     url(r"^flag/", include("flag.urls")),
-
 
     # for now, direct-to-template but should be in database
     url(r"^mapstory/thoughts/jonathan-marino/$", direct_to_template, {"template": "mapstory/thoughts.html",

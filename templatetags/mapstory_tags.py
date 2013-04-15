@@ -12,6 +12,7 @@ from geonode.maps.models import ALL_LANGUAGES
 from mapstory.models import Section
 from mapstory.models import Favorite
 from mapstory.models import PublishingStatus
+from mapstory.models import Resource
 from mapstory.models import PUBLISHING_STATUS_PRIVATE
 from mapstory.models import PUBLISHING_STATUS_LINK
 from mapstory.models import PUBLISHING_STATUS_PUBLIC
@@ -19,6 +20,7 @@ from mapstory.models import get_view_cnt_for
 from mapstory.util import render_manual
 from mapstory.views import _by_storyteller_pager
 from mapstory.views import _related_stories_pager
+from mapstory.views import _storyteller_activity_pager
 from dialogos.templatetags import dialogos_tags
 
 import re
@@ -181,6 +183,15 @@ class CommentsSectionNode(dialogos_tags.ThreadedCommentsNode):
 
 
 @register.simple_tag
+def resource_menu(exclude=None):
+    q = Resource.objects.all()
+    if exclude:
+        q = q.exclude(slug=exclude)
+    return loader.render_to_string("mapstory/_resource_menu.html", {
+        'resources' : q
+    })
+
+@register.simple_tag
 def related_mapstories(map_obj):
     map_obj, pager = _related_stories_pager(map_obj=map_obj)
     ctx = {'map': map_obj,
@@ -268,7 +279,18 @@ def by_storyteller(obj):
         'maps_pager': maps_page,
         'layers_pager': layers_page
     })
-        
+
+
+@register.simple_tag
+def activity_feed(user):
+    template_name = "mapstory/_activity_feed.html"
+    return loader.render_to_string(template_name, {
+        'user' : user,
+        'action_pager' : _storyteller_activity_pager(user, 'actions').page(1),
+        'other_actions_pager' : _storyteller_activity_pager(user, 'other-actions').page(1)
+    })
+
+
 _link_template = "<a href='%s'>%s</a>"
 _pt_link_template = "%s (%s)"
 absolutize = lambda u: u if u.startswith("http:") else settings.SITEURL[:-1] + u
@@ -281,6 +303,7 @@ def _activity_link(subject, plain_text=False):
     else:
         return subject
     return (_pt_link_template if plain_text else _link_template) % parts
+
 
 @register.simple_tag
 def activity_item(action, show_actor_link=True, plain_text=False):
@@ -319,12 +342,14 @@ def activity_item(action, show_actor_link=True, plain_text=False):
     # user, verb, subject, timestamp, ago
     return loader.render_to_string(template, ctx)
 
+
 @register.simple_tag
 def activity_notifier(user):
     if user.is_authenticated():
         cnted = user.useractivity.other_actor_actions.count()
         if cnted:
             return '<span title="Recent Activity" class="actnot">(%s)</span>' % cnted
+    return ''
 
 @register.simple_tag
 def layer_language_selector(layer):
@@ -398,9 +423,20 @@ def open_graph_meta(obj):
     return loader.render_to_string('_open_graph_meta.html', {
         'title' : obj.title,
         'type' : typename,
-        'url' : obj.get_absolute_url(),
+        'url' : absolutize(obj.get_absolute_url()),
+        'image' : obj.get_thumbnail_url(),
+        'description' : obj.abstract
+    })
+
+@register.simple_tag
+def twitter_card_meta(obj):
+    return loader.render_to_string('_twitter_card_meta.html', {
+        'title' : obj.title,
+        'content' : obj.abstract,
+        'url' : absolutize(obj.get_absolute_url()),
         'image' : obj.get_thumbnail_url()
     })
+    
 
 # @todo - make geonode location play better
 if settings.GEONODE_CLIENT_LOCATION.startswith("http"):

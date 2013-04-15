@@ -42,7 +42,7 @@
 
             {% if user.is_authenticated %}
                 <a id="login-link" href="{% url auth_logout %}">{% trans "Log out" %}</a>
-                <div class="user">{% activity_notifier user %}<a title="About You, The StoryTeller" href="{% url about_storyteller user.username %}">Welcome {{ user.username }}</a></div>
+                <div class="user">{% activity_notifier user %}<a title="About You, The StoryTeller" href="{% url about_storyteller user.username %}">Welcome {% if user.get_profile %}{{ user.get_profile.display_name }}{% else %}{{ user.username }}{% endif %}</a></div>
             {% else %}
                 <a id="login-link" href="#login-form-pop">{% trans "Log in" %}</a>
                 <div class="user">
@@ -155,51 +155,10 @@
         {% block sidebar %}{% endblock %}
         {% block bottom %}
             {% block resources %}
-                <div class="row">
-                    <div class="span12 mrg-btm">
-                        <div class="box">
-                            <h2>RESOURCES FOR:</h2>
-                            <div class="mini-slider fancyfont">
-                                <div class="slide">
-                                    {% for r in page.resources.value %}
-                                        <a href="{{ r.get_absolute_url }}">{{ r.name }}</a>
-                                        {% if not forloop.last %}
-                                        <span>|</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% cache cache_time 'resource_menu' %}
+                    {% resource_menu %}
+                {% endcache %}
             {% endblock %}
-
-            {% comment %}
-            {% block ads %}
-                <div class="row">
-                    <div class="span12 ads-box">
-                        <div class="ad">
-                            <a href="#">
-                                <img src="{% static "/theme/img/temp/ad1.png" %}" width="300" height="100" alt="Ad1" />
-                            </a>
-                            <p>Advertisement</p>
-                        </div>
-                        <div class="ad">
-                            <a href="#">
-                                <img src="{% static "/theme/img/temp/ad2.png" %}" width="300" height="100" alt="Ad2" />
-                            </a>
-                            <p>Advertisement</p>
-                        </div>
-                        <div class="ad last">
-                            <a href="#">
-                                <img src="{% static "/theme/img/temp/ad3.png" %}" width="300" height="100" alt="Ad3" />
-                            </a>
-                            <p>Advertisement</p>
-                        </div>
-                    </div>
-                </div>
-            {% endblock %}
-            {% endcomment %}
         {% endblock %}
       </div><!-- /.container -->
     </div><!-- /#main -->
@@ -217,7 +176,7 @@
           {% comment %}
           | <a href="{% url geonode.views.developer %}">{% trans "For Developers" %}</a>
           {% endcomment %}
-          <span style="float:right">MapStory&reg; is a registered trademark of the MapStory Foundation, a non-profit organization.</span>
+          <span style="float:right">MapStory&reg; is a registered trademark of the <a href='http://wiki.mapstory.org/index.php?title=The_MapStory_Foundation'>MapStory Foundation</a>, a non-profit organization.</span>
         </div>
       </div><!-- /.wrap -->
     </div><!-- /#footer -->
