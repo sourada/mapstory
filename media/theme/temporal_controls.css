@@ -8,7 +8,7 @@ div.gx-overlay-playback .x-btn-icon .x-btn-large .x-btn-text, .x-btn-noicon .x-b
     width: 34px;
 }
 .x-btn-icon .x-btn-medium .x-btn-text, .x-btn-noicon .x-btn-medium .x-btn-text {
-//    width: 34px;
+    width: 34px;
 }
 /*** Playback toolbar positioning ***/
 div.gx-playback-wrap div.gx-overlay-playback{
@@ -31,6 +31,10 @@ background-position: 0px -10px;
 }
 #map-bbar .x-btn button, .gx-overlay-playback .x-btn button{
     background-position: 0px -10px;
+}
+
+#ms-toolbar button {
+    width: 80px;
 }
 
 #notes-button button {
