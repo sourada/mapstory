@@ -1,0 +1,14 @@
+{% extends "admin/reports/base.html" %}
+{% load mapstory_tags %}
+
+{% block report_header %}Map/Layer User Activity{% endblock %}
+
+{% block report_form %}
+    Form goes here.
+{% endblock %}
+
+{% block report_output %}
+    {% for a in actions %}
+    <div>{% activity_item a %}</div>
+    {% endfor %}
+{% endblock %}

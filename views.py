@@ -14,6 +14,7 @@ from mapstory.forms import CheckRegistrationForm
 from mapstory.forms import StyleUploadForm
 from mapstory.forms import LayerForm
 import account.views
+from actstream.models import Action
 
 from dialogos.models import Comment
 
@@ -559,6 +560,13 @@ def user_activity_api(req):
         user_activity.save()
         return HttpResponse('OK')
 
+
+def reports_activity(req):
+    if not req.user.is_staff:
+        return HttpResponse("Not Allowed", status=400)
+
+    actions = Action.objects.all().order_by('timestamp')
+    return render_to_response('admin/reports/activity.html', {'actions': actions})
 
 def layer_xml_metadata(req, layer_id):
     obj = _resolve_object(req, Layer, 'maps.view_layer', perm_required=True, id=layer_id)

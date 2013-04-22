@@ -122,6 +122,9 @@ urlpatterns += patterns('mapstory.views',
     url(r"^announcements/", include("announcements.urls")),
     url(r"^flag/", include("flag.urls")),
 
+    # reports
+    url(r"^admin/reports/activity", "reports_activity", name="reports_activity"),
+
     # for now, direct-to-template but should be in database
     url(r"^mapstory/thoughts/jonathan-marino/$", direct_to_template, {"template": "mapstory/thoughts.html",
         "extra_context" : {'html':'mapstory/thoughts/jm.html'}}, name="thoughts-jm"),
