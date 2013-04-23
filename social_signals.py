@@ -36,13 +36,14 @@ def activity_summary(actions, plain_text=False):
 def batch_notification(days=1):
     for u in User.objects.filter(useractivity__notification_preference='S'):
         day_ago = datetime.datetime.now() - datetime.timedelta(days=days)
-        actions = u.useractivity.other_actor_actions.filter(timestamp_gte=day_ago)
+        actions = u.useractivity.other_actor_actions.filter(timestamp__gte=day_ago)
         if not actions: continue
+        _logger.info('sending %d notifications to %s', len(actions), u)
         send_html_mail("[MapStory] Daily Summary Notification",
                        message=activity_summary(actions, plain_text=True),
                        message_html=activity_summary(actions),
                        from_email="do-not-reply@mapstory.org", 
-                       recipient_list=[user.email])
+                       recipient_list=[u.email])
 
 
 def notify_handler(sender, instance, action, model, pk_set, **kwargs):
