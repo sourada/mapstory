@@ -109,7 +109,7 @@
       </p>
       <p id="csv-msg" class="alert alert-warn">MapStory will automatically look for spatial data 
           in columns titled latitude, lat, longtitude, lon, and long.  You will also be able to pick 
-          the columns later if the spatial data are contained in other columns.
+          the columns later if the spatial data are contained in other columns. <strong>NOTE: You must provide column names.</strong>
           {% manual_link "prep-filetypes" "Learn More &#187;" %}
       </p>
       <p id="unknown-msg" class="alert alert-warn">
@@ -176,6 +176,9 @@ setup({
 <p>To upload a StoryLayer, the following files are required: *.shp, *.dbf, and
 *.shx. A *.prj is strongly suggested and an optional *.sld file may be provided.
 </p>
+<p>CSV files (<strong>column name headers required</strong>) are also supported.</p>
+<p>There is also <strong>experimental</strong> support for raster files. If possible, try
+to ensure the files are using a 'standard' projection.</p>
 <p>You can also upload all the required files as a ZIP file.
 </p>
 <p>For more help, see the {% manual_link "prep" "manual" %}</p>
