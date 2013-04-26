@@ -89,6 +89,18 @@ class SocialTest(TestCase):
         self.assertEqual(1, len(actions))
         self.assertEqual('admin added layer2 Layer on map1 by admin 0 minutes ago', str(actions[0]))
 
+    def test_annotations_filtering(self):
+        bobby_layer = Layer.objects.create(owner=self.bobby, name='_map_42_annotations',typename='doesntmatter')
+        # lets publish it
+        bobby_layer.publish.status = 'Public'
+        bobby_layer.publish.save()
+        actions = self.bobby.actor_actions.all()
+        # no record
+        self.assertEqual(0, len(actions))
+        bobby_layer.save()
+        # no record again
+        self.assertEqual(0, len(actions))
+
     def test_activity_item_tag(self):
         lyr = Layer.objects.create(owner=self.bobby, name='layer1',typename='layer1', title='example')
         lyr.publish.status = 'Public'
