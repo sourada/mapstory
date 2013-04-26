@@ -47,11 +47,12 @@ var app = new GeoExplorer();
             Ext.DomHelper.overwrite(Ext.get("map-title-header"), titleTemplate.apply({title: app.about.title}));
         },
         "saved": function(id) {
+            var link = permalink(app.mapID);
             //reset title header
-            Ext.DomHelper.overwrite(Ext.get("map-title-header"), titleTemplate.apply({title: app.about.title}))
+            Ext.DomHelper.overwrite(Ext.get("map-title-header"), titleTemplate.apply({title: app.about.title, permalink: link}))
 
             //reset more info link
-            Ext.DomHelper.overwrite(Ext.get("more-info"), moreInfoTemplate.apply({permalink: permalink(app.mapID)}))
+            Ext.DomHelper.overwrite(Ext.get("more-info"), moreInfoTemplate.apply({permalink: link}))
         },
         scope: {}
     });
@@ -86,7 +87,7 @@ gxp.form.FontComboBox.prototype.defaultFont = 'Arial';
 </div>
 <div id="templates">
   <div id="more-info-tpl"><a class='link' href='{permalink}'>{% trans "View info" %}</a></div>
-  <div id="title-tpl"><a class='maplist' href='{% url maps_search %}'>{% trans "Maps" %}</a> / <strong>{title}</strong></div>
+  <div id="title-tpl"><a class='maplist' href='{% url maps_search %}'>{% trans "Maps" %}</a> / <a href="{permalink}">{title}</a></div>
 </div>
 {% comment %}new map view has no map{% endcomment %}
 {% if map %}{% map_view_hitcount map %}{% endif %}
