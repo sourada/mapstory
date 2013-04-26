@@ -17,6 +17,10 @@ from agon_ratings.models import Rating
 from mapstory.util import user
 from mailer import send_html_mail
 import datetime
+import urllib2
+import re
+from urlparse import urlparse
+import logging
 
 
 def activity_summary(actions, plain_text=False):
@@ -70,6 +74,14 @@ def action(actor, verb, action_object=None, target=None, public=True):
     return newaction
 
 
+def _is_annotations_layer(obj):
+    if isinstance(obj, Layer):
+        from django.conf import settings # circular deps
+        for exc in settings.LAYER_EXCLUSIONS:
+            if re.search(exc, obj.name):
+                return True
+    return False
+
 def action_handler(create_verb='created', update_verb='updated', provide_user=True):
     def handler(sender, instance, created, **kwargs):
         if created and not create_verb:
@@ -89,6 +101,9 @@ def action_handler(create_verb='created', update_verb='updated', provide_user=Tr
                 # a non request caused this
                 return
             action_object = instance
+            if _is_annotations_layer(action_object):
+                # for now, could create an action for the map
+                return
         action(actor, verb=active_verb, action_object=action_object)
     return handler
 
@@ -134,6 +149,8 @@ def comment_handler(sender, instance, created, **kwargs):
 def publishing_handler(sender, instance, created, **kw):
     if instance.status == 'Public':
         what = instance.map or instance.layer
+        if _is_annotations_layer(what):
+            return
         action(what.owner, 'published', action_object=what)
         layers = getattr(what, 'local_layers', [])
         for l in layers:
