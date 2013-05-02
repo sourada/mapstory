@@ -66,7 +66,7 @@
     LayerResult.prototype.checkLayerSource = function (callback) {
         var ge = this.geoExplorer,
             layer = this.layer,
-            sourceId = 'geonode:' + layer.title + '-search',
+            sourceId = layer.name + '-search',
                     // get the layer source from Geo explorer
             source = ge.layerSources[sourceId];
 
@@ -101,7 +101,10 @@
 
         this.checkLayerSource(function (source) {
             var record = source.createLayerRecord({
-                name: layer.title,
+                // TODO this is a hack as i had to remove the geonode
+                // namespace in order to get geo explorer to add the
+                // layer
+                name: layer.name.replace('geonode:', ''),
                 source: source.id
             });
             layerStore.add([record]);
