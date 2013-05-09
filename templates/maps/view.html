@@ -36,7 +36,7 @@ $(function () {
    // make sure we are on the maps new page
    if (window.location.pathname.match('/maps/new')) {
 
-       var search = new window.LayerSearch({
+       var search = new window.mapstory.LayerSearch({
            geoExplorer: app,
            searchUrl: '/search/api'
        }).render();

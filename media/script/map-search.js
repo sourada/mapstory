@@ -1,6 +1,8 @@
 /*jslint browser: true, nomen: true, indent: 4, maxlen: 80 */
 /*global window, jQuery, _, Ext  */
 
+var mapstory = mapstory || {};
+
 (function ($) {
     'use strict';
     var LayerResult, LayerSearch, layerElementTemplate, widgetTemplate;
@@ -101,13 +103,11 @@
 
         this.checkLayerSource(function (source) {
             var record = source.createLayerRecord({
-                // TODO this is a hack as i had to remove the geonode
-                // namespace in order to get geo explorer to add the
-                // layer
-                name: layer.name.replace('geonode:', ''),
+                name: layer.name.split(':').pop(),
                 source: source.id
             });
-            layerStore.add([record]);
+
+            layerStore.add(record);
 
         });
     };
@@ -150,7 +150,8 @@
         this.searchUrl = options.searchUrl;
         this.geoExplorer = options.geoExplorer;
 
-        this.pageSize = 5;
+        this.pageSize = options.pageSize || 10;
+
         this.currentPage = 1;
         this.numberOfRecords = 0;
 
@@ -166,10 +167,12 @@
         this.template = widgetTemplate;
 
     };
+
     LayerSearch.prototype.setPageButtons = function () {
         this.setPrevButton();
         this.setNextButton();
     };
+
 
     LayerSearch.prototype.setPrevButton = function () {
         if (this.currentPage < 2) {
@@ -212,7 +215,7 @@
         var self = this;
         this.numberOfRecords = layers.total;
 
-         // if the start location is higher then the number of
+         // if the start location is higher than the number of
         // returned records, then reset the page number and redo the
         // query
         if (layers.total <= this.getStart() && layers.total !== 0) {
@@ -233,7 +236,7 @@
         ).is(':checked');
 
         var queryParameters = {
-                // hard code the type as it does not sense to add a
+                // hard code the type as it does not make sense to add a
                 // map to another map
                 bytype: 'layer',
                 limit: this.pageSize,
@@ -305,6 +308,6 @@
         return this;
     };
 
-    window.LayerSearch = LayerSearch;
+    window.mapstory.LayerSearch = LayerSearch;
 
 }(jQuery));
