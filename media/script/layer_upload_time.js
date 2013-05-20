@@ -170,9 +170,9 @@ Ext.onReady(function() {
         Ext.select("select[@name*=attribute]").each(function(i) {
             var name = i.dom.name, blank = name.indexOf(exclude) < 0;
             if (endAttribute) {
-                blank = name.startsWith('end');
+                blank = /^end/.test(name);
             } else {
-                blank = !name.startsWith('end');
+                blank = ! /^end/.test(name);
             }
             if (blank) {
                 i.dom.value = '';
