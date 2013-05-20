@@ -8,6 +8,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.admin import UserAdmin
 import csv
 
+from mapstory.reports.admin import export_via_model
+
 
 def export_as_csv_action(description="Export selected objects as CSV file",
                          fields=None, exclude=None, query_factory=None):
@@ -27,34 +29,35 @@ def export_as_csv_action(description="Export selected objects as CSV file",
         if query_factory:
             queryset = query_factory(queryset)
 
-        opts = modeladmin.model._meta
-        field_names = set([field.name for field in opts.fields])
-        if fields:
-            fieldset = set(fields)
-            field_names = field_names & fieldset
-        elif exclude:
-            excludeset = set(exclude)
-            field_names = field_names - excludeset
+        return export_via_model(
+            modeladmin.model,
+            request,
+            queryset,
+            fields,
+            exclude
+        )
 
-        response = HttpResponse(mimetype='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=%s.csv' % unicode(opts).replace('.', '_')
-        writer = csv.DictWriter(response, field_names)
-        writer.writeheader()
-
-        for obj in queryset:
-            writer.writerow(dict(zip(field_names,[unicode(getattr(obj, field)).encode("utf-8","replace") for field in field_names])))
-        return response
     export_as_csv.short_description = description
     return export_as_csv
 
-admin.site.add_action(export_as_csv_action())
+
+# remove non important values form the export script
+export_func = export_as_csv_action(
+    exclude=[
+        'password',
+        'is_active',
+        'is_superuser',
+        'id'
+    ]
+)
+UserAdmin.actions = [export_func]
 
 
 class ResourceForm(forms.ModelForm):
     text = forms.CharField(widget=forms.Textarea)
     class Meta:
         model = Resource
-        
+
 class ResourceAdmin(admin.ModelAdmin):
     list_display = 'id','name','order'
     list_display_links = 'id',
@@ -73,7 +76,7 @@ class SectionAdmin(admin.ModelAdmin):
     list_editable = 'name','order'
     form = SectionForm
     ordering = ['order',]
-    
+
 class VideoLinkForm(forms.ModelForm):
     text = forms.CharField(widget=forms.Textarea)
     class Meta:
@@ -84,7 +87,7 @@ class VideoLinkAdmin(admin.ModelAdmin):
     list_display_links = 'id',
     list_editable = 'name','title','publish','href','location'
     form = VideoLinkForm
-    
+
 class ContactDetailAdmin(admin.ModelAdmin):
     pass
 
