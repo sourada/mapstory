@@ -23,7 +23,7 @@ def generate_user_report(req):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def activity_report(req):
-    actions = Action.objects.all().order_by('timestamp')
+    actions = Action.objects.all().order_by('-timestamp')
     page = int(req.GET.get('page', 0))
     size = 100
     count = actions.count()
