@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Mapstory reports</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
-  <body>
+{% extends "reports/base.html" %}
 
+{% block title %}
+MapStory Admin
+{% endblock %}
+
+{% block content %}
     <div>
       <h3>Reports</h3>
       <ul>
-        <li>
-          <a 
-             href="{% url mapstory.reports.views.generate_user_report%}">
-            Generate User report
-          </a>
-        </li>
+          <li>
+              <a href="{% url reports_user_report %}">
+                  User Details CSV Report
+              </a>
+          </li>
+          <li>
+              <a href="{% url reports_activity %}">
+                  Activity Report
+              </a>
+          </li>
       </ul>
     </div>
-
-
-  </body>
-</html>
+{% endblock %}

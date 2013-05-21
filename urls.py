@@ -71,6 +71,8 @@ urlpatterns += patterns('mapstory.views',
     # don't use the old registration page
     url(r'^accounts/register/$', RedirectView.as_view(url='/account/signup/'), name='registration_register'),
 
+    (r'^admin/reports/', include('mapstory.reports.urls')),
+
     (r'', include('geonode.simplesearch.urls')), # put this first to ensure search urls priority
     (r'', include('geonode.urls')),
     (r'', include('mapstory.reports.urls')),
