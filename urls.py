@@ -67,7 +67,7 @@ urlpatterns += patterns('mapstory.views',
     url(r"^account/signup/$", SignupView.as_view(), name="account_signup"),
     # and this from geonode
     url(r'^data/(?P<layername>[^/]*)/metadata$', 'layer_metadata', name="layer_metadata"),
-    
+
     # redirect some common geonode stuff
     url(r'^data/$', NamedRedirect.as_view(name='search_layers'), name='data_home'),
     url(r'^maps/$', NamedRedirect.as_view(name='search_maps', not_post=True), name='maps_home'),
@@ -78,9 +78,12 @@ urlpatterns += patterns('mapstory.views',
 
     (r'', include('geonode.simplesearch.urls')), # put this first to ensure search urls priority
     (r'', include('geonode.urls')),
+
+    (r'', include('mapstory.reports.urls')),
+
     url(r"^invites/", include("kaleo.urls")),
     url(r'^oembed/', include("oembed.urls")),
-    
+
     (r'^data/create_annotations_layer/(?P<mapid>\d+)$','create_annotations_layer'),
     url(r'^mapstory/donate/$',direct_to_template, {"template":"mapstory/donate.html"},name='donate'),
     url(r'^mapstory/thanks/$',direct_to_template, {"template":"mapstory/thanks.html"}),
@@ -102,7 +105,7 @@ urlpatterns += patterns('mapstory.views',
     url(r'^mapstory/by_storyteller_pager/(?P<user>\S+)/(?P<what>\S+)$','by_storyteller_pager',name='by_storyteller_pager'),
     url(r'^mapstory/related_mapstories_pager/(?P<map_id>\d+)$','related_mapstories_pager',name='related_mapstories_pager'),
     url(r'^data/style/upload$','upload_style',name='upload_style'),
-    
+
     # semi-temp urls
     url(r'^mapstory/user_activity_api$','user_activity_api',name='user_activity_api'),
     url(r'^mapstory/metadata/(?P<layer_id>\d+)$','layer_xml_metadata',name='layer_xml_metadata'),
@@ -161,4 +164,3 @@ if settings.SERVE_MEDIA:
             'document_root' : settings.THUMBNAIL_STORAGE,
         })
     )
-    
