@@ -88,6 +88,10 @@ urlpatterns += patterns('mapstory.views',
         direct_to_template,
         {'template': 'annotations.html'}),
 
+    url(r'^client-tests/$',
+        direct_to_template,
+        {'template': 'tests/client-tests.html'}),
+
     (r'^data/create_annotations_layer/(?P<mapid>\d+)$','create_annotations_layer'),
     url(r'^mapstory/donate/$',direct_to_template, {"template":"mapstory/donate.html"},name='donate'),
     url(r'^mapstory/thanks/$',direct_to_template, {"template":"mapstory/thanks.html"}),
