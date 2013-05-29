@@ -103,8 +103,9 @@ def action_handler(create_verb='created', update_verb='updated', provide_user=Tr
         action_object = None
         if provide_user:
             actor = user()
-            if not actor:
-                # a non request caused this
+            if not actor or actor.is_anonymous:
+                # a non request caused this OR
+                # @todo the test client has set an anonymous user in the thread local
                 return
             action_object = instance
             if _is_annotations_layer(action_object):
