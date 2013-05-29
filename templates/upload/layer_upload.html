@@ -116,6 +116,10 @@
           the columns later if the spatial data are contained in other columns. <strong>NOTE: You must provide column names.</strong>
           {% manual_link "prep-filetypes" "Learn More &#187;" %}
       </p>
+      <p id="raster-msg" class="alert alert-warn">MapStory will automatically compute timestamps for
+          you rasters. These must be encoded in the file names using ISO standards.
+          {% manual_link "prep-raster" "Learn More &#187;" %}
+      </p>
       <p id="unknown-msg" class="alert alert-warn">
           Please select a .zip, .shp, or .csv file as the data file.  Other file types can be added after selecting a data file.
       </p>
@@ -132,6 +136,7 @@
   </div>
 </div>
 <script type="text/javascript" src="{% static "script/layer_upload.js" %}"></script>
+<script type="text/javascript" src="{% static "script/zip.js" %}"></script>
 <script type="text/javascript">
 {% autoescape off %}
 setup({
