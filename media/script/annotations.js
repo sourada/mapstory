@@ -3,8 +3,10 @@
 
 (function (global, Ext, OpenLayers, undefined) {
     'use strict';
+
     Ext.ns('mapstory.annotations');
     Ext.ns('mapstory.annotations.protocol');
+
 
     // the annotation protocol supports filtering "features" by
     // map id and by bounding box.
@@ -20,10 +22,22 @@
     // GET /map/:id/annotations/:id -> returns a single annotation
     // DELETE /map/:id/annotations/:id -> removes an annotation
 
+
+
     mapstory.annotations.Protocol = OpenLayers.Class(OpenLayers.Protocol, {
 
         initialize: function (options) {
             this.format = options.format;
+            this.http = options.http || OpenLayers.Request;
+
+            if (!options.mapConfig) {
+                throw {
+                    'name': 'MapstoryError',
+                    'message': 'You must provide an map config object'
+                };
+            }
+            this.mapConfig = options.mapConfig;
+            this.baseUrl = '/maps/' + this.mapConfig.id + '/annotations';
             OpenLayers.Protocol.prototype.initialize.apply(this, arguments);
 
         },
@@ -32,23 +46,39 @@
             OpenLayers.Protocol.prototype.destory.apply(this);
         },
 
-
-
         read: function () {
             OpenLayers.Protocol.prototype.read.apply(this, arguments);
+            var resp = this.http.GET({
+                url: this.baseUrl
+            });
+
+            return resp;
 
         },
-        /** Takes a an array of features and POSTs then to the correct
-         *  end point
-         *
-         */
-        create: function (features, options) {
 
+        create: function (feature) {
+            var resp = this.http.POST({
+                url: this.baseUrl,
+                data: feature
+            });
+            return resp;
         },
 
-        update: function (feature, options) {
-
+        update: function (feature) {
+            var resp = this.http.PUT({
+                url: this.baseUrl + '/' + feature.id,
+                data: feature
+            });
+            return resp;
         },
+
+        delete: function (feature) {
+            var resp = this.http.DELETE({
+                url: this.baseUrl + '/' + feature.id
+            });
+            return resp;
+        },
+
         CLASS_NAME: 'mapstory.annotations.Prototype'
 
     });
