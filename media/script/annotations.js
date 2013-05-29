@@ -6,6 +6,19 @@
     Ext.ns('mapstory.annotations');
     Ext.ns('mapstory.annotations.protocol');
 
+    // the annotation protocol supports filtering "features" by
+    // map id and by bounding box.
+
+    // we also support editing via a feature manager
+
+    // assume that the current annotation end point supports a restful
+    // api.
+
+
+    // GET /map/:id/annotations/ -> returns a list
+    // POST /map/:id/annotations/ -> creates a annotation
+    // GET /map/:id/annotations/:id -> returns a single annotation
+    // DELETE /map/:id/annotations/:id -> removes an annotation
 
     mapstory.annotations.Protocol = OpenLayers.Class(OpenLayers.Protocol, {
 
@@ -22,6 +35,7 @@
 
 
         read: function () {
+            OpenLayers.Protocol.prototype.read.apply(this, arguments);
 
         },
         /** Takes a an array of features and POSTs then to the correct

@@ -30,7 +30,7 @@
                 _get = OpenLayers.Request.GET; // capture the get
             // method
 
-            OpenLayers.Request.GET = function () {
+            OpenLayers.Request.GET = function (options) {
                 return 'get';
             };
 
@@ -42,6 +42,16 @@
 
             // return the get method to OpenLayers
             OpenLayers.Request.GET = _get;
+        });
+
+        Q.test('test read with box filter', function () {
+            var pro = new Protocol({}),
+                bounds = new OpenLayers.Bounds(1, 2, 3, 4);
+
+            pro.read({ 
+                filter: {}
+            });
+
         });
 
         Q.test('test creating the features', function () {
