@@ -441,7 +441,7 @@ def open_graph_meta(obj):
     return loader.render_to_string('_open_graph_meta.html', {
         'title' : obj.title,
         'type' : typename,
-        'url' : obj.get_absolute_url(),
+        'url' : absolutize(obj.get_absolute_url()),
         'image' : obj.get_thumbnail_url(),
         'description' : obj.abstract
     })
