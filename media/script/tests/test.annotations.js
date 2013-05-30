@@ -13,26 +13,117 @@
 
         Q.ok(format instanceof Format, 'Don\'t clobber the constructor');
 
+        Q.test('array:[int] -> point', function () {
+            var point = format.parsePoint([1, 2]);
+
+            Q.ok(
+                point instanceof OpenLayers.Geometry.Point,
+                'return the correct class'
+            );
+
+            Q.strictEqual(point.x, 1, 'preserve the correct ordering');
+            Q.strictEqual(point.y, 2, 'preserve the correct ordering');
+
+        });
+
+        Q.test('array:[[int]] -> linestring ', function () {
+            var lineString = format.parseLineString([
+                [1, 2],
+                [3, 4],
+                [5, 7]
+            ]);
+
+            Q.ok(
+                lineString instanceof OpenLayers.Geometry.LineString,
+                'Make sure we get the right type back'
+            );
+
+            Q.strictEqual(
+                lineString.components[0].x,
+                1,
+                'Make sure the x value of the first point is the same'
+            );
+
+            Q.strictEqual(
+                lineString.components[0].y,
+                2,
+                'Make sure the x value of the first point is the same'
+            );
+
+        });
+
+        Q.test('array[[[]]] -> polygon', function () {
+            var polygon = format.parsePolgyon(
+                {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [100.0, 0.0],
+                            [101.0, 0.0],
+                            [101.0, 1.0],
+                            [100.0, 1.0],
+                            [100.0, 0.0]
+                        ]
+                    ]
+                }
+            );
+
+            Q.ok(polygon instanceof OpenLayers.Geometry.Polygon);
+
+        });
+
+        Q.test('parsing of geojson features', function () {
+            Q.ok(true);
+
+        });
+
         Q.test('Test reading features', function () {
-            var feature = format.read([{
-                "in_map": true,
-                "in_timeline": false,
-                "title": "this is a test",
-                "start_time": null,
-                "appearance": "",
-                "content": "this is some content for the annotations.",
-                "end_time": null,
-                "the_geom": "{ \"type\": \"Point\", \"coordinates\": [-74, 40] }",
-                "id": 1
-            }]);
+            var feature = format.read([
+                "{",
+                " \"in_map\": true, ",
+                "\"the_geom\": ",
+                "{ \"type\": \"Point\", \"coordinates\": [-74.000, 40.000] }",
+                "}"
+            ].join(""));
 
             Q.ok(feature instanceof OpenLayers.Feature.Vector);
+
+            Q.strictEqual(
+                feature.attributes.in_map,
+                true,
+                'the properties should carries over to the feature'
+            );
+
+            Q.ok(
+                feature.geometry instanceof OpenLayers.Geometry.Point,
+                'The geometry object should be an instance of Geometry'
+            );
 
         });
 
         Q.test('Test writing features', function () {
-            format.write({});
-            Q.ok(true);
+            var feature = new OpenLayers.Feature.Vector(
+                new OpenLayers.Geometry.Point(-74.000, 40.000),
+                {
+                    "in_map": true,
+                    // make sure we handle date objects
+                    "start_time": new Date(),
+                    "content": "this is some content for the annotations.",
+                    "id": 1
+                }
+            ), results = format.write(feature);
+
+            Q.strictEqual(
+                results.the_geom.type,
+                'Point'
+            );
+
+            Q.strictEqual(
+                results.the_geom.coordinates[0],
+                -74.000,
+                'Make sure we don\'t lose any precision'
+            );
+
         });
 
     });

@@ -6,12 +6,71 @@
     var Formater;
     Ext.ns('ms.annotations');
 
+    /**
+     * @constructor
+     */
     ms.annotations.Format = function (options) {
+        if (!options) { options = {}; }
         this.geoJSON = new OpenLayers.Format.GeoJSON();
+        this.geometryColumn = 'the_geom';
     };
 
-    ms.annotations.Format.prototype.read = function (object) {
-        return new OpenLayers.Feature.Vector();
+    /** Provides a convince method that returns a point object from an array
+     *  @param {array} array
+     *  @returns {OpenLayers.Geometry.Point}
+     */
+    ms.annotations.Format.prototype.parsePoint = function (array) {
+        return new OpenLayers.Geometry.Point(array[0], array[1]);
+    };
+
+    /**
+     * @params {array} array
+     * @returns {OpenLayers.Geometry.LineString}
+     */
+    ms.annotations.Format.prototype.parseLineString = function (array) {
+        var points = [];
+
+        array.forEach(function (element) {
+            points.push(this.parsePoint(element));
+        }, this);
+
+        return new OpenLayers.Geometry.LineString(points);
+    };
+
+    ms.annotations.Format.prototype.parsePolgyon = function (array) {
+
+    };
+
+    ms.annotations.Format.prototype.parseJSON = function (object) {
+
+
+        switch (object.type.toLowerCase()) {
+        case 'point':
+            return this.parsePoint(object.coordinates);
+        case 'linestring':
+            return this.parseLineString(object.coordinates);
+        case 'polgyon':
+            return {};
+        default:
+            throw {
+                message: 'Unable to parse geometry'
+            };
+        }
+    };
+
+    /**
+     * @param {string} str
+     */
+    ms.annotations.Format.prototype.read = function (str) {
+        var object = JSON.parse(str),
+            geomColumn = object[this.geometryColumn];
+
+
+        return new OpenLayers.Feature.Vector(
+            this.parseJSON(geomColumn),
+            object
+        );
+
     };
 
     ms.annotations.Format.prototype.readArray = function (array) {
@@ -19,7 +78,14 @@
     };
 
     ms.annotations.Format.prototype.write = function (features) {
-
+        return {
+            the_geom: {
+                type: 'Point',
+                coordinates: [
+                        -74.00
+                ]
+            },
+        };
     };
 
 
