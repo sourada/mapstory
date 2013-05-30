@@ -1,17 +1,45 @@
 /*jslint browser: true, nomen: true, indent: 4, maxlen: 80 */
-/*global jQuery, QUnit, OpenLayers, mapstory */
+/*global jQuery, QUnit, OpenLayers, ms */
 
-(function (Q, mapstory, undefined) {
+(function (Q, ms, undefined) {
     'use strict';
 
-    var Protocol = mapstory.annotations.Protocol;
+    var Protocol = ms.annotations.Protocol,
+        Format = ms.annotations.Format;
 
     Q.module('Mapstory annotations');
+    Q.test('Mapstory annotations format', function () {
+        var format = new Format();
 
-    Q.test('Mapstory annotations', function () {
+        Q.ok(format instanceof Format, 'Don\'t clobber the constructor');
 
-        var _get, _post, _delete,
-            protocol = new Protocol({
+        Q.test('Test reading features', function () {
+            var feature = format.read([{
+                "in_map": true,
+                "in_timeline": false,
+                "title": "this is a test",
+                "start_time": null,
+                "appearance": "",
+                "content": "this is some content for the annotations.",
+                "end_time": null,
+                "the_geom": "{ \"type\": \"Point\", \"coordinates\": [-74, 40] }",
+                "id": 1
+            }]);
+
+            Q.ok(feature instanceof OpenLayers.Feature.Vector);
+
+        });
+
+        Q.test('Test writing features', function () {
+            format.write({});
+            Q.ok(true);
+        });
+
+    });
+
+    Q.test('Mapstory annotations Protocol', function () {
+
+        var protocol = new Protocol({
                 mapConfig: {
                     id: 1
                 },
@@ -150,4 +178,4 @@ include that feature\'s id'
 
     });
 
-}(QUnit, mapstory));
+}(QUnit, ms));
