@@ -31,9 +31,13 @@
             Q.expect(2);
 
             var url = '/annotations',
+                res,
                 pro = new Protocol({
                     mapConfig: {
                         id: 1
+                    },
+                    response: function () {
+                        return {};
                     },
                     http: {
                         GET: function (options) {
@@ -47,9 +51,9 @@
                     }
                 });
 
-            Q.strictEqual(
-                pro.read({}),
-                'get',
+            res = pro.read();
+            Q.ok(
+                res.hasOwnProperty('priv'),
                 'Reading feature should be handled by Request.GET'
             );
 

@@ -1,4 +1,4 @@
-/*jslint browser: true, nomen: true, indent: 4, maxlen: 80 */
+/*jslint browser: true, nomen: true, indent: 4, */
 /*global Ext, OpenLayers, mapstory */
 
 (function (global, Ext, OpenLayers, undefined) {
@@ -29,6 +29,7 @@
         initialize: function (options) {
             this.format = options.format;
             this.http = options.http || OpenLayers.Request;
+            this.response = options.response || OpenLayers.Protocol.Response;
 
             if (!options.mapConfig) {
                 throw {
@@ -46,14 +47,29 @@
             OpenLayers.Protocol.prototype.destory.apply(this);
         },
 
+        parseFeatures: function (response) {
+
+        },
+
         read: function () {
             OpenLayers.Protocol.prototype.read.apply(this, arguments);
-            var resp = this.http.GET({
-                url: this.baseUrl
+            var resp = new this.response({
+                requestType: "read"
+            });
+
+            resp.priv = this.http.GET({
+                url: this.baseUrl,
+                callback: this.createCallback(this.readFeatures, resp)
             });
 
             return resp;
 
+        },
+
+        readFeatures: function (resp) {
+            resp.features = [new OpenLayers.Feature.Vector({
+                geometry: new OpenLayers.Geometry.Point(40, -74)
+            })];
         },
 
         create: function (feature) {
@@ -79,7 +95,7 @@
             return resp;
         },
 
-        CLASS_NAME: 'mapstory.annotations.Prototype'
+        CLASS_NAME: 'mapstory.annotations.Protocol'
 
     });
 

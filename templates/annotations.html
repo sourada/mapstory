@@ -11,48 +11,68 @@
           content="width=device-width,
                    initial-scale=1.0">
 
-    {% include "geonode/ext_header.html" %}
-    {% include "geonode/app_header.html" %}
-    {% include "geonode/geo_header.html" %}
-
     <link href="{% static "theme/bootstrap_custom.css" %}" 
           rel="stylesheet" />
-    <link href='http://fonts.googleapis.com/css?family=Marvel:400,400italic,700,700italic' 
-          rel='stylesheet' type='text/css'>
-    <link rel="stylesheet"
-          type="text/css"
-          href="{% geonode_static "externals/ext/resources/css/ext-all.css"" />
-    <link rel="stylesheet" 
-          type="text/css" 
-          href="{% static "theme/geonode.css" %}" media="screen" />
-    <link rel="stylesheet" 
-          type="text/css" 
-          href="{% static "theme/ext-theme.css" %}" media="screen" />
-    <link rel="stylesheet" 
-          type="text/css" 
-          href="{% static "theme/site.css" %}" 
-          media="screen" />    
+
+    <style type="text/css">
+      #olMap {
+        height: 600px;
+        width: 1000px;
+        background: #eee;
+      }
+    </style>
 
   </head>
   <body>
 
     <div class="container">
       <h1>Annotation editor</h1>
+      <div id="olMap">
+      </div>
     </div>
 
-    <script src="{% static "script/jquery-1.7.1.min.js" %}">
-    </script>
-    <script type="text/javascript"  
-            src="{% geonode_static "externals/ext/adapter/ext/ext-base.js" %}">
-    </script>
+  <script
+     src="{% geonode_static "externals/ext/adapter/ext/ext-base.js" %}">
+  </script>
 
-    <script type="text/javascript"
-            src="{% geonode_static "externals/ext/ext-all.js" %}">
-    </script>
+  <script
+     src="{% geonode_static "externals/ext/ext-all.js" %}">
+  </script>
 
-    <script type="text/javascript" src="{% url jscat %}"></script>
-    <script type="text/javascript" src="{% url lang %}"></script>
+  <script src="{% static "components/openlayers/OpenLayers.js" %}">
+  </script>
+  <script src="{% static "components/jquery/jquery.min.js" %}"></script>
+  <script src="{% static "script/annotations.js"%}"></script>
 
+  <script>
+    var map, layer;
+        
+    function init(){
+       map = new OpenLayers.Map('olMap');
+       var wms = new OpenLayers.Layer.WMS(
+           "OpenLayers WMS", "http://vmap0.tiles.osgeo.org/wms/vmap0",
+            {layers: 'basic'}
+       );
+
+       layer = new OpenLayers.Layer.Vector("annotations test", {
+                strategies: [new OpenLayers.Strategy.Fixed()],
+                protocol: new mapstory.annotations.Protocol({
+                        mapConfig: {
+                           id: 1
+                        }
+                    })
+                });
+
+          map.addLayers([wms, layer]);
+          map.zoomToExtent(new OpenLayers.Bounds(
+             -79.318576214907, 36.508050759734, -68.332248089907, 43.099847634734
+       ));
+     };
+
+    $(function() {
+       init();
+    })
+  </script>
 
 
   </body>
