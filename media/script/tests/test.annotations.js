@@ -4,8 +4,8 @@
 (function (Q, ms, undefined) {
     'use strict';
 
-    var Protocol = ms.annotations.Protocol,
-        Format = ms.annotations.Format;
+    var Protocol = ms.notes.Protocol,
+        Format = ms.notes.Format;
 
     Q.module('Mapstory annotations');
     Q.test('Mapstory annotations format', function () {
@@ -52,28 +52,60 @@
 
         });
 
-        Q.test('array[[[]]] -> polygon', function () {
-            var polygon = format.parsePolgyon(
-                {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [100.0, 0.0],
-                            [101.0, 0.0],
-                            [101.0, 1.0],
-                            [100.0, 1.0],
-                            [100.0, 0.0]
-                        ]
-                    ]
-                }
+        Q.test('array:[int] -> linear ring', function () {
+            var lineString = format.parseLinearRing([
+                [100.0, 0.0],
+                [101.0, 0.0],
+                [101.0, 1.0],
+                [100.0, 1.0],
+                [100.0, 0.0]
+
+            ]);
+            Q.ok(
+                lineString instanceof OpenLayers.Geometry.LinearRing,
+                'Make sure the correct type is returned'
             );
 
-            Q.ok(polygon instanceof OpenLayers.Geometry.Polygon);
+        });
+
+        Q.test('array[[], [[]]] -> polygon', function () {
+            var polygon = format.parsePolgyon([
+                [
+                    [100.0, 0.0],
+                    [101.0, 0.0],
+                    [101.0, 1.0],
+                    [100.0, 1.0],
+                    [100.0, 0.0]
+                ]
+            ]);
+
+            Q.ok(
+                polygon instanceof OpenLayers.Geometry.Polygon,
+                'return a polygon'
+            );
 
         });
 
         Q.test('parsing of geojson features', function () {
-            Q.ok(true);
+            var point = format.parseJSON({
+                'type': 'Point',
+                'coordinates': [10, 10]
+            });
+            Q.ok(point instanceof OpenLayers.Geometry.Point);
+        });
+
+        Q.test('test throwing an error on an unknow type', function () {
+            var badType = {
+                'type': 'Blah'
+            };
+
+            Q.throws(
+                function () {
+                    format.parseJSON(badType);
+                },
+                ms.notes.ParseError(),
+                'Make sure we throw an error on a bad type'
+            );
 
         });
 
@@ -91,7 +123,7 @@
             Q.strictEqual(
                 feature.attributes.in_map,
                 true,
-                'the properties should carries over to the feature'
+                'the properties should carry over to the feature'
             );
 
             Q.ok(

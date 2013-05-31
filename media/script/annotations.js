@@ -3,46 +3,79 @@
 
 (function (global, Ext, OpenLayers, undefined) {
     'use strict';
-    var Formater;
-    Ext.ns('ms.annotations');
+
+    Ext.ns('ms.notes');
 
     /**
      * @constructor
      */
-    ms.annotations.Format = function (options) {
-        if (!options) { options = {}; }
-        this.geoJSON = new OpenLayers.Format.GeoJSON();
-        this.geometryColumn = 'the_geom';
-    };
-
-    /** Provides a convince method that returns a point object from an array
-     *  @param {array} array
-     *  @returns {OpenLayers.Geometry.Point}
-     */
-    ms.annotations.Format.prototype.parsePoint = function (array) {
-        return new OpenLayers.Geometry.Point(array[0], array[1]);
+    ms.notes.ParseError = function (message) {
+        this.message = message;
     };
 
     /**
-     * @params {array} array
-     * @returns {OpenLayers.Geometry.LineString}
+     * @return {string} message
      */
-    ms.annotations.Format.prototype.parseLineString = function (array) {
-        var points = [];
+    ms.notes.ParseError.prototype.toString = function () {
+        return this.message;
+    };
 
-        array.forEach(function (element) {
+    /** Handles the low level reading and writing of mapstory's
+     *  annotations features
+     * @constructor
+     */
+    ms.notes.Format = function (options) {
+        if (!options) { options = {}; }
+        this.geometryColumn = options.geometryColumn || 'the_geom';
+    };
+
+    /** Provides a method that returns a point object from an array
+     *  @param {array} coordinates
+     *  @returns {OpenLayers.Geometry.Point}
+     */
+    ms.notes.Format.prototype.parsePoint = function (coordinates) {
+        return new OpenLayers.Geometry.Point(coordinates[0], coordinates[1]);
+    };
+
+    /** Converts an array into a line type.
+     *  @param {array} coordinates
+     *  @param {OpenLayer.Class} Cls
+     */
+    ms.notes.Format.prototype.parseLine = function (coordinates, Cls) {
+        var points = [];
+        coordinates.forEach(function (element) {
             points.push(this.parsePoint(element));
         }, this);
 
-        return new OpenLayers.Geometry.LineString(points);
+        if (!Cls) {
+            Cls = OpenLayers.Geometry.LineString;
+        }
+
+        return new Cls(points);
     };
 
-    ms.annotations.Format.prototype.parsePolgyon = function (array) {
-
+    /**
+     * @param {array} coordinates
+     * @returns {OpenLayers.Geometry.LineString}
+     */
+    ms.notes.Format.prototype.parseLineString = function (coordinates) {
+        return this.parseLine(coordinates);
     };
 
-    ms.annotations.Format.prototype.parseJSON = function (object) {
+    /**
+     * @param {array} coordinates
+     * @returns {OpenLayers.Geometry.LinearRing} ring
+     */
+    ms.notes.Format.prototype.parseLinearRing = function (coordinates) {
+        return this.parseLine(coordinates, OpenLayers.Geometry.LinearRing);
+    };
 
+    ms.notes.Format.prototype.parsePolgyon = function (array) {
+        var outerRing = this.parseLinearRing(array[0]);
+        return new OpenLayers.Geometry.Polygon([outerRing]);
+    };
+
+    ms.notes.Format.prototype.parseJSON = function (object) {
 
         switch (object.type.toLowerCase()) {
         case 'point':
@@ -50,34 +83,30 @@
         case 'linestring':
             return this.parseLineString(object.coordinates);
         case 'polgyon':
-            return {};
+            return this.parsePolgyon(object.coordinates);
         default:
-            throw {
-                message: 'Unable to parse geometry'
-            };
+            throw new ms.notes.ParseError();
         }
     };
 
     /**
      * @param {string} str
      */
-    ms.annotations.Format.prototype.read = function (str) {
+    ms.notes.Format.prototype.read = function (str) {
         var object = JSON.parse(str),
             geomColumn = object[this.geometryColumn];
-
 
         return new OpenLayers.Feature.Vector(
             this.parseJSON(geomColumn),
             object
         );
+    };
+
+    ms.notes.Format.prototype.readArray = function (array) {
 
     };
 
-    ms.annotations.Format.prototype.readArray = function (array) {
-
-    };
-
-    ms.annotations.Format.prototype.write = function (features) {
+    ms.notes.Format.prototype.write = function (features) {
         return {
             the_geom: {
                 type: 'Point',
@@ -103,7 +132,7 @@
     // GET /map/:id/annotations/:id -> returns a single annotation
     // DELETE /map/:id/annotations/:id -> removes an annotation
 
-    ms.annotations.Protocol = OpenLayers.Class(OpenLayers.Protocol, {
+    ms.notes.Protocol = OpenLayers.Class(OpenLayers.Protocol, {
 
         initialize: function (options) {
             this.http = options.http || OpenLayers.Request;
@@ -179,7 +208,7 @@
             return resp;
         },
 
-        CLASS_NAME: 'mapstory.annotations.Protocol'
+        CLASS_NAME: 'ms.notes.Protocol'
 
     });
 
