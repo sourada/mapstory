@@ -77,6 +77,10 @@
 
     ms.notes.Format.prototype.parseJSON = function (object) {
 
+        if (typeof object === 'string') {
+            object = JSON.parse(object);
+        }
+
         switch (object.type.toLowerCase()) {
         case 'point':
             return this.parsePoint(object.coordinates);
@@ -92,9 +96,12 @@
     /**
      * @param {string} str
      */
-    ms.notes.Format.prototype.read = function (str) {
-        var object = JSON.parse(str),
-            geomColumn = object[this.geometryColumn];
+    ms.notes.Format.prototype.read = function (object) {
+        if (typeof object === 'string') {
+            object = JSON.parse(object);
+        }
+
+        var geomColumn = object[this.geometryColumn];
 
         return new OpenLayers.Feature.Vector(
             this.parseJSON(geomColumn),
@@ -102,8 +109,15 @@
         );
     };
 
-    ms.notes.Format.prototype.readArray = function (array) {
+    ms.notes.Format.prototype.readArray = function (array_str) {
+        var array = JSON.parse(array_str),
+            features = [];
 
+        array.forEach(function (thing) {
+            features.push(this.read(thing));
+        }, this);
+
+        return features;
     };
 
     ms.notes.Format.prototype.write = function (features) {
@@ -137,7 +151,7 @@
         initialize: function (options) {
             this.http = options.http || OpenLayers.Request;
             this.response = options.response || OpenLayers.Protocol.Response;
-            this.geoJSON = new OpenLayers.Format.GeoJSON();
+            this.format   = new ms.notes.Format();
 
             if (!options.mapConfig) {
                 throw {
@@ -172,15 +186,9 @@
         },
 
         readFeatures: function (resp, options) {
-            var features = JSON.parse(resp.priv.responseText);
-
-            resp.features = [];
-            features.forEach(function (feature) {
-                var geometry = this.geoJSON.read(feature.the_geom)[0];
-                resp.features.push(geometry);
-
-            }, this);
-
+            resp.features = this.format.readArray(
+                resp.priv.responseText
+            );
             options.callback.call(options.scope, resp);
 
         },
