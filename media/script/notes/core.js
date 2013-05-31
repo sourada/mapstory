@@ -1,20 +1,26 @@
 /*jslint browser: true, nomen: true, indent: 4, */
-/*global Ext, OpenLayers, ms */
+/*global Ext, jQuery, OpenLayers, ms */
 
-(function (global, Ext, OpenLayers, undefined) {
+(function (global, Ext, $, OpenLayers, undefined) {
     'use strict';
+
+    // requires ie 8 and up
+    // uses JSON.parse and JSON.stringify which are currently
+    // supported in ie 8
+    // see http://caniuse.com/#search=JSON for more details
 
     Ext.ns('ms.notes');
 
     /**
      * @constructor
+     * @param {String} message
      */
     ms.notes.ParseError = function (message) {
         this.message = message;
     };
 
     /**
-     * @return {string} message
+     * @return {String} message.
      */
     ms.notes.ParseError.prototype.toString = function () {
         return this.message;
@@ -31,7 +37,7 @@
 
     /** Provides a method that returns a point object from an array
      *  @param {array} coordinates
-     *  @returns {OpenLayers.Geometry.Point}
+     *  @return {OpenLayers.Geometry.Point}
      */
     ms.notes.Format.prototype.parsePoint = function (coordinates) {
         return new OpenLayers.Geometry.Point(coordinates[0], coordinates[1]);
@@ -40,6 +46,7 @@
     /** Converts an array into a line type.
      *  @param {array} coordinates
      *  @param {OpenLayer.Class} Cls
+     *  @return {OpenLayers.Geometry}
      */
     ms.notes.Format.prototype.parseLine = function (coordinates, Cls) {
         var points = [];
@@ -55,60 +62,73 @@
     };
 
     /**
-     * @param {array} coordinates
-     * @returns {OpenLayers.Geometry.LineString}
+     * @param {Array} coordinates
+     * @return {OpenLayers.Geometry.LineString}
      */
     ms.notes.Format.prototype.parseLineString = function (coordinates) {
         return this.parseLine(coordinates);
     };
 
     /**
-     * @param {array} coordinates
-     * @returns {OpenLayers.Geometry.LinearRing} ring
+     * @param {Array} coordinates
+     * @return {OpenLayers.Geometry.LinearRing} ring.
      */
     ms.notes.Format.prototype.parseLinearRing = function (coordinates) {
         return this.parseLine(coordinates, OpenLayers.Geometry.LinearRing);
     };
 
-    ms.notes.Format.prototype.parsePolgyon = function (array) {
-        var outerRing = this.parseLinearRing(array[0]);
+    /**
+     * @param {Array} coordinates
+     * @return {OpenLayers.Geometry.Polygon}
+     */
+    ms.notes.Format.prototype.parsePolgyon = function (coordinates) {
+        var outerRing = this.parseLinearRing(coordinates[0]);
         return new OpenLayers.Geometry.Polygon([outerRing]);
     };
 
-    ms.notes.Format.prototype.parseJSON = function (object) {
+    /**
+     * @param {Object} geometry
+     * @return {OpenLayers.Geometry}
+     */
+    ms.notes.Format.prototype.parseJSON = function (geometry) {
 
-        if (typeof object === 'string') {
-            object = JSON.parse(object);
+        if (typeof geometry === 'string') {
+            geometry = JSON.parse(geometry);
         }
 
-        switch (object.type.toLowerCase()) {
+        switch (geometry.type.toLowerCase()) {
         case 'point':
-            return this.parsePoint(object.coordinates);
+            return this.parsePoint(geometry.coordinates);
         case 'linestring':
-            return this.parseLineString(object.coordinates);
+            return this.parseLineString(geometry.coordinates);
         case 'polgyon':
-            return this.parsePolgyon(object.coordinates);
+            return this.parsePolgyon(geometry.coordinates);
         default:
             throw new ms.notes.ParseError();
         }
     };
 
     /**
-     * @param {string} str
+     * @param {String} str
+     * @return {OpenLayers.Feature.Vector}
      */
-    ms.notes.Format.prototype.read = function (object) {
-        if (typeof object === 'string') {
-            object = JSON.parse(object);
+    ms.notes.Format.prototype.read = function (str) {
+        if (typeof str === 'string') {
+            str = JSON.parse(str);
         }
 
-        var geomColumn = object[this.geometryColumn];
+        var geomColumn = str[this.geometryColumn];
 
         return new OpenLayers.Feature.Vector(
             this.parseJSON(geomColumn),
-            object
+            str
         );
     };
 
+    /**
+     * @param {String} array_str
+     * @return {Array}
+     */
     ms.notes.Format.prototype.readArray = function (array_str) {
         var array = JSON.parse(array_str),
             features = [];
@@ -127,27 +147,14 @@
                 coordinates: [
                         -74.00
                 ]
-            },
+            }
         };
     };
 
-
-
-    // the annotation protocol supports filtering "features" by
-    // map id and by bounding box.
-
-    // we also support editing via a feature manager
-
-    // assume that the current annotation end point supports a restful
-    // api.
-
-    // GET /map/:id/annotations/ -> returns a list
-    // POST /map/:id/annotations/ -> creates a annotation
-    // GET /map/:id/annotations/:id -> returns a single annotation
-    // DELETE /map/:id/annotations/:id -> removes an annotation
-
     ms.notes.Protocol = OpenLayers.Class(OpenLayers.Protocol, {
-
+        /**
+         * @constructor
+         */
         initialize: function (options) {
             this.http = options.http || OpenLayers.Request;
             this.response = options.response || OpenLayers.Protocol.Response;
@@ -173,7 +180,7 @@
         read: function (options) {
             OpenLayers.Protocol.prototype.read.apply(this, arguments);
             var resp = new this.response({
-                requestType: "read"
+                requestType: 'read'
             });
 
             resp.priv = this.http.GET({
@@ -220,38 +227,5 @@
 
     });
 
-    ms.notes.main = function () {
-        var map, layer, bounds;
 
-        map = new OpenLayers.Map({
-            div: 'olMap',
-            layers: [
-                new OpenLayers.Layer.OSM()
-            ]
-        });
-
-        layer = new OpenLayers.Layer.Vector("annotations", {
-            strategies: [new OpenLayers.Strategy.Fixed()],
-            protocol: new ms.notes.Protocol({
-                mapConfig: {
-                    id: 1
-                }
-            })
-        });
-
-        map.addLayers([layer]);
-        bounds = new OpenLayers.Bounds(
-            -79.318576214907,
-            36.508050759734,
-            -68.332248089907,
-            43.099847634734
-        );
-        map.zoomToExtent(bounds.transform(
-            new OpenLayers.Projection('EPSG:4326'),
-            map.getProjection()
-        ));
-
-    };
-
-
-}(window, Ext, OpenLayers));
+}(window, Ext, jQuery, OpenLayers));
