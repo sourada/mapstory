@@ -75,7 +75,6 @@ urlpatterns += patterns('mapstory.views',
 
     (r'', include('geonode.simplesearch.urls')), # put this first to ensure search urls priority
     (r'', include('geonode.urls')),
-    (r'', include('mapstory.reports.urls')),
 
     url(r"^invites/", include("kaleo.urls")),
     url(r'^oembed/', include("oembed.urls")),
