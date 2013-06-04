@@ -145,7 +145,7 @@
             the_geom: {
                 type: 'Point',
                 coordinates: [
-                        -74.00
+                    -74.00
                 ]
             }
         };
@@ -216,7 +216,7 @@
             return resp;
         },
 
-        delete: function (feature) {
+        'delete': function (feature) {
             var resp = this.http.DELETE({
                 url: this.baseUrl + '/' + feature.id
             });

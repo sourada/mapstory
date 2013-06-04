@@ -1,0 +1,12 @@
+{
+    "name": "mapstory-client",
+    "version": "0.0.1",
+    "dependencies": {
+        "jsdoc": "*",
+        "jslint": "*",
+        "yeti": "*",
+        "grover": "*",
+        "istanbul": "*"
+    }
+
+}
