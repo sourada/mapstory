@@ -8,13 +8,13 @@ jUnitOut = ./test.junit.xml
 .PHONY: test
 
 
-all: install test
+all: install lint test
 
 install:
 	npm install
 
-#lint:
-#	$(jslint) 
+lint:
+	@find src test -name "*.js" \! -name "*min.js" -print0 | xargs -0 $(jslint)
 
 clean:
 	rm $(jUnitOut)

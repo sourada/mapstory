@@ -5,8 +5,9 @@
     'use strict';
 
     var Protocol = ms.notes.Protocol,
-        Format = ms.notes.Format,
-        assert = YUITest.Assert;
+        Format   = ms.notes.Format,
+        assert   = YUITest.Assert,
+        mock     = YUITest.Mock;
 
     TestRunner.add(new YUITest.TestCase({
         name: 'Mapstory annotations format',
