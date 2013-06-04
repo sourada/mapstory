@@ -1,10 +1,11 @@
 /*jslint browser: true, nomen: true, indent: 4, maxlen: 80 */
-/*global window, jQuery, _, Ext  */
+/*global jQuery, Ext, ms  */
 
-var mapstory = mapstory || {};
-
-(function ($) {
+(function (global, Ext, $) {
     'use strict';
+
+    Ext.ns('ms.mapSearch');
+
     var LayerResult, LayerSearch, layerElementTemplate, widgetTemplate;
 
 
@@ -145,7 +146,7 @@ var mapstory = mapstory || {};
 
     // main view object controls rendering widget template and
     // controls the events that are attached to this widget
-    LayerSearch = function (options) {
+    LayerSearch = ms.mapSearch.LayerSearch = function (options) {
 
         this.searchUrl = options.searchUrl;
         this.geoExplorer = options.geoExplorer;
@@ -308,6 +309,5 @@ var mapstory = mapstory || {};
         return this;
     };
 
-    window.mapstory.LayerSearch = LayerSearch;
 
-}(jQuery));
+}(window, Ext, jQuery));

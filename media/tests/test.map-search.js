@@ -4,15 +4,53 @@
 (function (ms) {
     'use strict';
 
-    var Protocol = ms.notes.Protocol,
-        Format   = ms.notes.Format,
-        assert   = YUITest.Assert,
-        mock     = YUITest.Mock;
+    var LayerSearch  = ms.mapSearch.LayerSearch,
+        LayerResult  = ms.mapSearch.LayerResult,
+        assert       = YUITest.Assert,
+        mock         = YUITest.Mock;
 
     TestRunner.add(new YUITest.TestCase({
         name: 'Mapstory map search',
-        'This should blow up': function () {
-            assert.isTrue(false);
+
+        setUp: function () {
+            this.mockGeoExplorer = mock();
+
+            this.layerSearch = new LayerSearch({
+                geoExplorer: this.mockGeoExplorer
+            });
+        },
+
+        tearDown: function () {
+            delete this.layerSearch;
+            delete this.mockGeoExplorer;
+        },
+
+        'Make sure we don\'t clobber the constructor': function () {
+
+            assert.isInstanceOf(
+                LayerSearch,
+                this.layerSearch,
+                'Make sure the correct type is returned'
+            );
+
+            assert.areEqual(
+                this.layerSearch.constructor,
+                LayerSearch
+            );
+            // TODO check whats the difference between these two checks?
+
+            assert.areEqual(
+                this.layerSearch.pageSize,
+                10,
+                'Make the default page size is correct'
+            );
+
+            assert.areEqual(
+                this.layerSearch.$el.attr('id'),
+                'ms-search-widget',
+                'Make sure the id of the widget is correctly set'
+            );
+
         }
     }));
 
