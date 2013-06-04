@@ -1,6 +1,6 @@
 
-jslint = ./node_modules/jslint/bin/jslint.js
-grover = ./node_modules/grover/bin/grover.js
+jslint = ./node_modules/.bin/jslint
+grover = ./node_modules/.bin/grover
 
 specFile = spec.html
 jUnitOut = ./test.junit.xml
@@ -17,8 +17,8 @@ install:
 #	$(jslint) 
 
 clean:
-	rm -rf $(jUnitOut)
+	rm $(jUnitOut)
 	rm -rf ./node_modules
 
 test:
-	@grover $(specFile) -o $(jUnitOut) --junit
+	@$(grover) $(specFile) -o $(jUnitOut) --junit
