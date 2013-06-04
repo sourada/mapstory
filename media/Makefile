@@ -1,17 +1,24 @@
 
+jslint = ./node_modules/jslint/bin/jslint.js
+grover = ./node_modules/grover/bin/grover.js
+
+specFile = spec.html
+jUnitOut = ./test.junit.xml
+
 .PHONY: test
+
 
 all: install test
 
 install:
 	npm install
 
-lint:
-	./node_modules/jslint/bin/jslint.js script/notes/core.js
+#lint:
+#	$(jslint) 
 
 clean:
-	rm -rf ./test.junit.xml
+	rm -rf $(jUnitOut)
 	rm -rf ./node_modules
 
 test:
-	./node_modules/grover/bin/grover.js spec.html -o ./test.junit.xml --junit
+	@grover $(specFile) -o $(jUnitOut) --junit
