@@ -12,6 +12,8 @@ function init(options) {
 
     var xml_unsafe = /(^[^a-zA-Z\._]+)|([^a-zA-Z0-9\._])/g;
 
+    var zipFileNames = [];
+
     var listeners = {
         "fileselected": function(cmp, value) {
             // remove the path from the filename - avoids C:/fakepath etc.
@@ -207,6 +209,7 @@ function init(options) {
         rasterMsg.hide();
         unknownMsg.hide();
         tooLongMsg.hide();
+        Ext.get("zip-msg-container").addClass('hide');
         if (base_file.getValue().length > 64) {
             tooLongMsg.show();
             checkFormValid();
@@ -332,53 +335,58 @@ function init(options) {
     }
 
     function checkZipContent(file) {
-        var names = [], directoryPresent = false, success = true, 
+        var directoryPresent = false, success = true, 
             vectorMainFile = null, rasterMainFile = null;
         if (! /\.zip$/.test(file.name)) return false;
 
         function complete(msg, ext) {
+            var msgContainer = Ext.get("zip-msg-container");
             if (msg) {
-                errorHandler(null, { result : {
-                    errors : [msg]
-                }});
+                msgContainer.select('div').addClass('hide');
+                msgContainer.select(msg).removeClass('hide');
+                msgContainer.removeClass('hide');
             }
             if (ext) {
-                Ext.get('form-messages').enableDisplayMode().hide();
+                msgContainer.addClass('hide');
                 showFileMessage(ext, true);
             }
+            Ext.get('show-files').removeClass('hide');
         }
 
         zip.createReader(new zip.BlobReader(file), function(reader) {
             // get all entries from the zip
             reader.getEntries(function(entries) {
                 var i, e, ext, main;
+                zipFileNames = [];
+                for (i = 0; i < entries.length; i++) {
+                    zipFileNames.push(entries[i].filename);
+                }
                 for (i = 0; i < entries.length; i++) {
                     e = entries[i];
-                    names.push(e.filename);
                     if (e.directory) {
                         directoryPresent = true;
                     }
                     ext = getExtension(e.filename);
                     if (isVectorExt(ext)) {
                         if (rasterMainFile || vectorMainFile) {
-                            return complete("Please upload only one type of file at a time", null);
+                            return complete('#single-file', null);
                         }
                         vectorMainFile = e.filename;
                     }
                     if (isRasterExt(ext)) {
                         if (vectorMainFile) {
-                            return complete("Please upload only one type of file at a time", null);
+                            return complete('#single-file', null);
                         }
                         rasterMainFile = e.filename;
                     }
                 }
                 
                 if (directoryPresent) {
-                    return complete("Please do not include any directories", null);
+                    return complete('#no-directories', null);
                 }
 
                 if (!rasterMainFile && !vectorMainFile) {
-                    return complete("The zip file does not appear to contain any recognized files", null);
+                    return complete('#no-recognized', null);
                 }
 
                 main = rasterMainFile == null ? vectorMainFile : rasterMainFile;
@@ -386,7 +394,7 @@ function init(options) {
                 return complete(null, getExtension(main));
             });
         }, function(error) {
-            complete('There was an error reading the zip file', false);
+            complete('#error-reading', false);
         });
         return true;
     }
@@ -505,7 +513,25 @@ function init(options) {
             } else {
                 originalHandler();
             }
-        }
+        };
+
+        Ext.get('show-files').on('click', function() {
+            var els = [], el, i, list = Ext.get('file-list'), name;
+            for (i=0; i < zipFileNames.length; i++) {
+                name = zipFileNames[i]
+                el = { tag: 'li', html: name };
+                if (!/\.zip$/i.test(name) && isMainFile(name)) {
+                    el['class'] = 'bitchin';
+                    el['style'] = { 'font-weight': 'bold'};
+                }
+                els.push(el);
+            }
+            Ext.DomHelper.overwrite(list, {
+                tag : 'ul',
+                children: els
+            });
+            list.removeClass('hide');
+        });
     }
     
     var confirmDelete = true;
