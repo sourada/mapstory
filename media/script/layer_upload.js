@@ -32,7 +32,7 @@ function init(options) {
         allowBlank: false,
         listeners: listeners,
         validator: function(name) {
-            return isMainFile(name);
+            return isMainFile(name) && name.length <= 64;
         }
     });
 
@@ -115,6 +115,7 @@ function init(options) {
     var csvMsg = containerFromDom('csv-msg').hide();
     var rasterMsg = containerFromDom('raster-msg').hide();
     var unknownMsg = containerFromDom('unknown-msg').hide();
+    var tooLongMsg = containerFromDom('too-long-msg').hide();
 
     form_fields.push(base_file);
     form_fields.push(zipMsg);
@@ -122,6 +123,7 @@ function init(options) {
     form_fields.push(csvMsg);
     form_fields.push(rasterMsg);
     form_fields.push(unknownMsg);
+    form_fields.push(tooLongMsg);
     form_fields.push(sld_file);
     
     if (options.is_featuretype) {
@@ -205,6 +207,12 @@ function init(options) {
         rasterMsg.hide();
         unknownMsg.hide();
         if (ext == null) return;
+        tooLongMsg.hide();
+        if (base_file.getValue().length > 64) {
+            tooLongMsg.show();
+            checkFormValid();
+            return;
+        }
         switch (ext) {
             case 'shp':
                 // if the shp is in a zip, don't show the message
