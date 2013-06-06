@@ -22,6 +22,7 @@ import re
 from urlparse import urlparse
 import logging
 
+_logger = logging.getLogger('mapstory.social_signals')
 
 def activity_summary(actions, plain_text=False):
     sep = "\n" if plain_text else "<br/>"
